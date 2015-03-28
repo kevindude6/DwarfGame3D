@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <!-- TODO: replace this Asset with your own XML asset data. -->
+  <Asset Type="BradGame3D.Art.SpriteSheet">
+    <name>Squirrel</name>
+    <animationTiles>
+      <Item>0 1500 1 2000 2 2500 3 3000 4 3500 5 4000 6 4500</Item>
+      <Item>32 167 33 333 34 500</Item>
+    </animationTiles>
+    <animationNames>
+      <Item>Idle</Item>
+      <Item>Walk</Item>
+    </animationNames>
+    <widthPx>256</widthPx>
+    <heightPx>256</heightPx>
+    <tileWidth>32</tileWidth>
+    <tileHeight>32</tileHeight>
+    <fileName>Sprite_creature_squirrel</fileName>
+    
+  </Asset>
+</XnaContent>

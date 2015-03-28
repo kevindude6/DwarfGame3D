@@ -1,0 +1,5 @@
+﻿00 = end chunk
+
+0-0-xpos-zpos
+
+y-z-x

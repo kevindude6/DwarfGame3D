@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <!-- TODO: replace this Asset with your own XML asset data. -->
+  <Asset Type="BradGame3D.Art.SpriteSheet">
+    <name>PathIndicator</name>
+    <animationTiles>
+      <Item>0 500 1 1000</Item>
+    </animationTiles>
+    <animationNames>
+      <Item>Idle</Item>
+    </animationNames>
+    <widthPx>64</widthPx>
+    <heightPx>32</heightPx>
+    <tileWidth>32</tileWidth>
+    <tileHeight>32</tileHeight>
+    <fileName>Sprite_creature_squirrel</fileName>
+    
+  </Asset>
+</XnaContent>

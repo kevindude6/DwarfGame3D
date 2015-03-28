@@ -1,0 +1,7 @@
+﻿0-air
+1-grass
+2-stone
+3-dirt
+4-cobble
+5-light
+6-flora
