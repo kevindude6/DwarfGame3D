@@ -46,41 +46,41 @@ namespace BradGame3D
                     int y = (i/(Chunk.xSize*Chunk.zSize)) + yBase;
                     int z = (i%(Chunk.xSize*Chunk.zSize))/Chunk.zSize + c.chunkZ*Chunk.zSize;
                     byte a = c.world.getBlockData((int) Chunk.DATA.ID,x,y,z - 1);
-                    if (!Block.getSolid(a))
+                    if (!Block.getRender(a))
                     {
                         Block.addFront(ref c.world, ref vertices, new Vector3(x, y, z), blockIds[i], 15);
                         newfaceCount++;
                     }
                     a = c.world.getBlockData((int)Chunk.DATA.ID, x, y, z + 1);
-                    if (!Block.getSolid(a))
+                    if (!Block.getRender(a))
                     {
                         Block.addBack(ref c.world, ref vertices, new Vector3(x, y, z), blockIds[i], 15);
                         newfaceCount++;
                     }
                    
                     a = c.world.getBlockData((int)Chunk.DATA.ID, x+1, y, z);
-                    if (!Block.getSolid(a))
+                    if (!Block.getRender(a))
                     {
                         Block.addLeft(ref c.world, ref vertices, new Vector3(x, y, z), blockIds[i], 15);
                         newfaceCount++;
                     }
                    
                     a = c.world.getBlockData((int)Chunk.DATA.ID, x-1, y, z);
-                    if (!Block.getSolid(a))
+                    if (!Block.getRender(a))
                     {
                         Block.addRight(ref c.world, ref vertices, new Vector3(x, y, z), blockIds[i], 15);
                         newfaceCount++;
                     }
                     
                     a = c.world.getBlockData((int)Chunk.DATA.ID, x, y+1, z);
-                    if (!Block.getSolid(a))
+                    if (!Block.getRender(a))
                     {
                         Block.addTop(ref c.world, ref vertices, new Vector3(x, y, z), blockIds[i], 15);
                         newfaceCount++;
                     }
                     
                     a = c.world.getBlockData((int)Chunk.DATA.ID, x, y-1, z);
-                    if (!Block.getSolid(a))
+                    if (!Block.getRender(a))
                     {
                         Block.addBot(ref vertices, new Vector3(x, y, z), blockIds[i], 15);
                         newfaceCount++;

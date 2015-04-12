@@ -37,6 +37,10 @@ namespace BradGame3D.AI.Pathing
             SortedList<float, EnhancedNode> openList = new SortedList<float, EnhancedNode>(new DuplicateKeyComparer<float>());
             List<EnhancedNode> closedList = new List<EnhancedNode>();
 
+            if (GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, end.x, end.y, end.z)].getSolid())
+            {
+                return null;
+            }
             EnhancedNode st = new EnhancedNode(start.x, start.y, start.z);
             st.cost = 0;
             st.parent = null;
@@ -62,6 +66,7 @@ namespace BradGame3D.AI.Pathing
                     foreach (EnhancedNode t in temp)
                     {
                         EnhancedNode n = new EnhancedNode(t.x,t.y,t.z);
+                        /*
                         if (GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y, n.z)].getSolid())
                         {
 
@@ -70,7 +75,8 @@ namespace BradGame3D.AI.Pathing
                         {
 
                         }
-                        else
+                         */
+                        if (!GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y, n.z)].getSolid())
                         {
                             float newCost = current.cost + getHeuristic(current, n.toNode());
 

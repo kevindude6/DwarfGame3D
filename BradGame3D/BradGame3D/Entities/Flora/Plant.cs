@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 namespace BradGame3D.Entities.Flora
 {
@@ -20,17 +21,21 @@ namespace BradGame3D.Entities.Flora
         protected VertexPositionColorTexture[] vertices;
         public Color mColor = Color.Red; 
         protected Chunk c;
+        BoundingBox bounds;
 
         public Plant()
         {
 
         }
-        public Plant(Chunk tchunk, int seed, Vector3 pos)
+        public Plant(ref Chunk tchunk, int seed, Vector3 pos)
         {
             c = tchunk;
             rSeed = seed;
+
             baseBlock = pos;
+           // Debug.WriteLine("Uh: " + baseBlock.X + "," + baseBlock.Y + "," + baseBlock.Z);
             genFromSeed();
+            doBounds();
             initVertices();
             setPlaceholders();
             
@@ -39,11 +44,19 @@ namespace BradGame3D.Entities.Flora
         {
             tex = temp;
         }
+        public void doBounds()
+        {
+            bounds = new BoundingBox(new Vector3(baseBlock.X - width / 2, baseBlock.Y - 0.5f, baseBlock.Z - width / 2), new Vector3(baseBlock.X + width / 2, baseBlock.Y + height - 0.5f, baseBlock.Z + width / 2));
+        }
         public void setPlaceholders()
         {
-            for (int i = (int) baseBlock.Y; i < baseBlock.Y + (float)(Math.Round(height)); i++)
+            if (collideable)
             {
-                c.world.setBlockData(6, (int) Chunk.DATA.ID, baseBlock + new Vector3(0,i,0));
+                for (int i = 0; i < (float)(Math.Round(height)); i++)
+                {
+                    c.setBlockData((int)Chunk.DATA.ID,6, (int) baseBlock.X, (int) baseBlock.Y+i, (int) baseBlock.Z);
+                    //Debug.WriteLine("Uh: " + i);
+                }
             }
         }
         public abstract void genFromSeed();

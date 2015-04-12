@@ -333,9 +333,10 @@ namespace BradGame3D
 
         public void makeTree(Vector3 a)
         {
-            Tree t = new Tree(getChunk(a), new Random().Next(),a);
+            Chunk temp = getChunk(a);
+            Tree t = new Tree(ref temp, new Random().Next(),a);
             t.setTexture(game.treeTex);
-            getChunk(a).addFlora(t);
+            temp.addFlora(t);
             //flora.Add(t);
         }
         public Chunk getChunk(Vector3 a)

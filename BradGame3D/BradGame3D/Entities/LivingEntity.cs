@@ -30,8 +30,11 @@ namespace BradGame3D.Entities
         }
         public void followPath(Path p)
         {
-            currentPath = p;
-            followingPath = true;
+            if (p != null)
+            {
+                currentPath = p;
+                followingPath = true;
+            }
         }
         public static float findAng(Vector2 a, Vector2 b)
         {

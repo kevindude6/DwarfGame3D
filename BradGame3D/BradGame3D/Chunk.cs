@@ -61,7 +61,8 @@ namespace BradGame3D
         }
         public void genTrees(ref Random r)
         {
-            
+
+            Chunk temp = this;
             int treeCount = r.Next(1,5); // 1,5
 
             for (int i = 0; i < treeCount; i++)
@@ -80,7 +81,7 @@ namespace BradGame3D
                     }
                     y -= 1;
                 }
-                addFlora(new Tree(this, r.Next(), new Vector3(x, baseY, z)));
+                addFlora(new Tree(ref temp, r.Next(), new Vector3(x, baseY, z)));
             }
             int shrubCount = r.Next(4, 14);
             for (int i = 0; i < shrubCount; i++)
@@ -99,7 +100,7 @@ namespace BradGame3D
                     }
                     y -= 1;
                 }
-                addFlora(new Shrub(this, r.Next(), new Vector3(x, baseY, z)));
+                addFlora(new Shrub(ref temp, r.Next(), new Vector3(x, baseY, z)));
             }
         }
         public void buildFromByteArray(byte[] a)

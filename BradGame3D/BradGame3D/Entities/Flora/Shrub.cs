@@ -18,7 +18,7 @@ namespace BradGame3D.Entities.Flora
         public static  Vector2 texBottomLeft= new Vector2(xOff, texHeight+yOff);
         public static  Vector2 texBottomRight= new Vector2(texWidth+xOff, texHeight+yOff);
 
-        public Shrub(Chunk c, int seed, Vector3 pos): base(c, seed, pos)
+        public Shrub(ref Chunk c, int seed, Vector3 pos): base(ref c, seed, pos)
         {
 
         }

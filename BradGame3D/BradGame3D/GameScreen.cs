@@ -59,32 +59,36 @@ namespace BradGame3D
         Art.SpriteSheetManager sheetManager;
 
         int currentBlock;
-        
+        public void initBlockData()
+        {
+            int[] tempSideArray = { 0, 0, 0, 0, 0, 0 };
+            blockDataManager.addBlock("Air", false, false, false, tempSideArray, 32, 320);
+
+            tempSideArray = new int[] { 0, 0, 0, 0, 1, 4 };
+            //tempSideArray = new int[] { 2, 2, 2, 2, 2, 2 };
+            blockDataManager.addBlock("Grass", true, true, false, tempSideArray, 32, 320);
+
+            tempSideArray = new int[] { 2, 2, 2, 2, 2, 2 };
+            blockDataManager.addBlock("Stone", true, true, false, tempSideArray, 32, 320);
+
+            tempSideArray = new int[] { 4, 4, 4, 4, 4, 4 };
+            blockDataManager.addBlock("Dirt", true, true, false, tempSideArray, 32, 320);
+
+            tempSideArray = new int[] { 3, 3, 3, 3, 3, 3 };
+            blockDataManager.addBlock("Cobblestone", true, true, false, tempSideArray, 32, 320);
+
+
+            tempSideArray = new int[] { 5, 5, 5, 5, 5, 5 };
+            blockDataManager.addBlock("Light", true, true, true, tempSideArray, 32, 320);
+
+            tempSideArray = new int[] {0,0,0,0,0,0};
+            blockDataManager.addBlock("Flora Placeholder", false, true, false, tempSideArray, 32, 320);
+        }
+
         public GameScreen(Game1 g)
         {
+            initBlockData();
             
-            int[] air = {0,0,0,0,0,0};
-            blockDataManager.addBlock("Air", false, false, false, air,32,320);
-
-            air = new int[] {0,0,0,0,1,4};
-            //air = new int[] { 2, 2, 2, 2, 2, 2 };
-            blockDataManager.addBlock("Grass", true,true, false, air,32,320);
-
-            air = new int[] { 2, 2, 2, 2, 2, 2 };
-            blockDataManager.addBlock("Stone", true, true, false, air, 32, 320);
-
-            air = new int[] { 4, 4, 4, 4, 4, 4 };
-            blockDataManager.addBlock("Dirt", true, true, false, air, 32, 320);
-
-            air = new int[] { 3, 3, 3, 3, 3, 3 };
-            blockDataManager.addBlock("Cobblestone", true, true, false, air, 32, 320);
-
-
-            air = new int[] { 5, 5, 5, 5, 5, 5 };
-            blockDataManager.addBlock("Light", true, true, true, air, 32, 320);
-
-            air = new int[] { 0, 0, 0, 0, 0, 0 };
-            blockDataManager.addBlock("Flora Placeholder",false,true,false,air,32,320);
 
             game = g;
             graphics = game.graphics;
@@ -261,9 +265,9 @@ namespace BradGame3D
                         Vector3 temp = a + lookFace;
                         //end = new AI.Pathing.Node((int)temp.X, (int)temp.Y, (int)temp.Z);
 
-                        w.setBlockData((byte)0, (int)Chunk.DATA.ID, a);
+                        //w.setBlockData((byte)0, (int)Chunk.DATA.ID, a);
                         
-                        //test.followPath(AI.Pathing.Pathing.findPath(test.center,temp,w));
+                        test.followPath(AI.Pathing.Pathing.findPath(test.center,temp,w));
                         
                         mouseReady = false;
                         /*
@@ -401,7 +405,7 @@ namespace BradGame3D
                     }
                 }
 
-                if (Block.getSolid(w.getBlockData((int) Chunk.DATA.ID, x, y, z)))
+                if (Block.getRender(w.getBlockData((int) Chunk.DATA.ID, x, y, z)))
                 {
                     lookFace = tempLookFace;
                     return new Vector3(x,y,z);
