@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Xml;
 using BradGame3D.Art;
+using BradGame3D.PlayerInteraction;
 
 namespace BradGame3D
 {
@@ -23,14 +24,11 @@ namespace BradGame3D
         Thread chunkLoadingThread;
 
         const float rotationSpeed = 0.0075f;
-        public Vector3 camPos = new Vector3(256,120,256);
+
         public Matrix View;
         public Matrix Projection;
-        public Vector3 cameraRotatedTarget;
-        public Vector2 camDir = new Vector2(0,0);
-        private float yaw, pitch;
 
-        private AlphaTestEffect effect;
+        public AlphaTestEffect effect;
         private Effect billboardEffect;
         private GraphicsDeviceManager graphics;
 
@@ -39,12 +37,16 @@ namespace BradGame3D
         private int mouseWheelPrevious;
         private bool mouseReady;
         private bool mouseEnabled;
-        private Vector3 lookFace;
+
+        private Vector3 blockCastTarget = new Vector3(0,0,0);
+        private Vector3 lookFace = new Vector3(0,0,0);
+
         public BoundingFrustum frustum;
         public Texture2D tex;
         public Texture2D treeTex;
         public Texture2D dogeTex;
 
+        public Camera mCam;
         public LivingEntity test;
         
         public AI.Pathing.Node start = null;
@@ -128,6 +130,7 @@ namespace BradGame3D
             chunkLoadingThread.Start();
 
             loadThings();
+            mCam = new Camera(this,w,graphics, new Vector3(256,150,256));
 
         }
         public void loadThings()
@@ -149,7 +152,7 @@ namespace BradGame3D
 
             loadedChunkThisFrame = false;
             doInputGame(gameTime);
-            doCameraGame();
+            mCam.doCameraGame();
             updateFrustum();
             updateEnts(gameTime);
           
@@ -193,15 +196,8 @@ namespace BradGame3D
             KeyboardState k = Keyboard.GetState();
             checkFunctionalKeys(k);
 
-            if (k.IsKeyDown(Keys.Up))
-                pitch += 0.005f*gameTime.ElapsedGameTime.Milliseconds;
-            if (k.IsKeyDown(Keys.Down))
-                pitch -= 0.005f*gameTime.ElapsedGameTime.Milliseconds;
-            if (k.IsKeyDown(Keys.Right))
-                yaw -= 0.005f * gameTime.ElapsedGameTime.Milliseconds;
-            if (k.IsKeyDown(Keys.Left))
-                yaw += 0.005f*gameTime.ElapsedGameTime.Milliseconds;
-
+            mCam.doCameraInput(gameTime, k);
+             
             bool pauseplaceholder = false;
             if (k.IsKeyDown(Keys.R))
                 pauseplaceholder = true;
@@ -223,20 +219,21 @@ namespace BradGame3D
 
             if (currentMouseState != originalMouseState)
             {
-                mMouseIndicator.setPosition(raycast());
+                if(mCam.raycastBlock(ref blockCastTarget,ref lookFace))
+                    mMouseIndicator.setPosition(blockCastTarget);
                 if (mouseEnabled)
                 {
                     float xDifference = currentMouseState.X - originalMouseState.X;
                     float yDifference = currentMouseState.Y - originalMouseState.Y;
-                    yaw -= rotationSpeed * xDifference;
-                    pitch -= rotationSpeed * yDifference;
+                    mCam.yaw-= rotationSpeed * xDifference;
+                    mCam.pitch -= rotationSpeed * yDifference;
                     Mouse.SetPosition(game.Window.ClientBounds.Width / 2, game.Window.ClientBounds.Height / 2);
-                 
+
                 }
          
                 if (currentMouseState.LeftButton == ButtonState.Pressed && mouseReady)
                 {
-                    Vector3 a = raycast();
+                    Vector3 a = blockCastTarget;
                     if (!Vector3.Equals(a, new Vector3(-1, -1, -1)))
                     {
                         //w.makeTree(a + lookFace);
@@ -255,7 +252,7 @@ namespace BradGame3D
                 }
                 if (currentMouseState.RightButton == ButtonState.Pressed && mouseReady)
                 {
-                    Vector3 a = raycast();
+                    Vector3 a = blockCastTarget;
                     if (!Vector3.Equals(a, new Vector3(-1, -1, -1)))
                     {
                         //w.makeTree(a + lookFace);
@@ -291,177 +288,43 @@ namespace BradGame3D
 
                 if (mouseWheelPrevious < currentMouseState.ScrollWheelValue)
                 {
-                    camPos += (cameraRotatedTarget) * (float)gameTime.ElapsedGameTime.TotalSeconds * 300f;
+                    mCam.camPos += (mCam.cameraRotatedTarget) * (float)gameTime.ElapsedGameTime.TotalSeconds * 300f;
                     mouseWheelPrevious = currentMouseState.ScrollWheelValue;
                 }
                 else if (mouseWheelPrevious > currentMouseState.ScrollWheelValue)
                 {
-                    camPos += (cameraRotatedTarget) * (float)gameTime.ElapsedGameTime.TotalSeconds * -300f;
+                    mCam.camPos += (mCam.cameraRotatedTarget) * (float)gameTime.ElapsedGameTime.TotalSeconds * -300f;
                     mouseWheelPrevious = currentMouseState.ScrollWheelValue;
                 }
             }
 
-            Vector3 flatCamTarget = new Vector3(cameraRotatedTarget.X, 0, cameraRotatedTarget.Z);
+            Vector3 flatCamTarget = new Vector3(mCam.cameraRotatedTarget.X, 0, mCam.cameraRotatedTarget.Z);
             flatCamTarget.Normalize();
             Vector3 flatCamTargetRot = new Vector3(flatCamTarget.Z,0,-flatCamTarget.X);
            
             if (k.IsKeyDown(Keys.W))
-                camPos += (flatCamTarget)*(float) gameTime.ElapsedGameTime.TotalSeconds*40f;
+                mCam.camPos += (flatCamTarget)*(float) gameTime.ElapsedGameTime.TotalSeconds*40f;
             if (k.IsKeyDown(Keys.S))
-                camPos += flatCamTarget* (float)gameTime.ElapsedGameTime.TotalSeconds*-40f;
+                mCam.camPos += flatCamTarget* (float)gameTime.ElapsedGameTime.TotalSeconds*-40f;
             if (k.IsKeyDown(Keys.A))
             {
-                camPos += (flatCamTargetRot) * (float)gameTime.ElapsedGameTime.TotalSeconds * 40f;
+                mCam.camPos += (flatCamTargetRot) * (float)gameTime.ElapsedGameTime.TotalSeconds * 40f;
             }
             if (k.IsKeyDown(Keys.D))
             {
-                camPos += (flatCamTargetRot) * (float)gameTime.ElapsedGameTime.TotalSeconds * -40f;
+                mCam.camPos += (flatCamTargetRot) * (float)gameTime.ElapsedGameTime.TotalSeconds * -40f;
             }
 
             oldKeyState = k;
 
-        }
-        //private Vector3 raycast()
-
-        
-        
-        
-        private Vector3 raycast()
-        {
-            MouseState s = Mouse.GetState();
-            double mouseX = s.X;
-            double mouseY = s.Y;
-            Vector3 nearsource = new Vector3((float)mouseX, (float)mouseY, 0f);
-            Vector3 farsource = new Vector3((float)mouseX, (float)mouseY, 1f);
-
-            Matrix world = effect.World;
-
-            Vector3 nearPoint = graphics.GraphicsDevice.Viewport.Unproject(nearsource,
-                effect.Projection, effect.View, world);
-
-            Vector3 farPoint = graphics.GraphicsDevice.Viewport.Unproject(farsource,
-                effect.Projection, effect.View, world);
-
-
-
-            Vector3 dir = Vector3.Normalize(farPoint - nearPoint);
-            if (dir == Vector3.Zero)
-                return new Vector3(-1,-1,-1);
-            int x = (int)Math.Round(camPos.X);
-            int y = (int)Math.Round(camPos.Y);
-            int z = (int)Math.Round(camPos.Z);
-
-            int stepX = Math.Sign(dir.X);
-            int stepY = Math.Sign(dir.Y);
-            int stepZ = Math.Sign(dir.Z);
-
-            float tMaxX = intBound(camPos.X, dir.X);
-            float tMaxY = intBound(camPos.Y, dir.Y);
-            float tMaxZ = intBound(camPos.Z, dir.Z);
-
-            float tDeltaX = stepX / dir.X;
-            float tDeltaY = stepY / dir.Y;
-            float tDeltaZ = stepZ / dir.Z;
-
-           
-
-
-
-            Vector3 tempLookFace;
-            while (
-                (stepX > 0 ? x < World2.worldSize * Chunk.xSize : x >= 0) &&
-                (stepY > 0 ? y < Chunk.ySize : y >= 0) &&
-                (stepZ > 0 ? z < World2.worldSize * Chunk.zSize : z >= 0))
-            {
-                if (tMaxX < tMaxY)
-                {
-                    if (tMaxX < tMaxZ)
-                    {
-                        x += stepX;
-                        tMaxX += tDeltaX;
-                        tempLookFace = new Vector3(-stepX, 0, 0);
-
-                    }
-                    else
-                    {
-                        z += stepZ; 
-                        tMaxZ += tDeltaZ;
-                        tempLookFace = new Vector3(0, 0, -stepZ);
-                    }
-                }
-                else
-                {
-                    if (tMaxY < tMaxZ)
-                    {
-                        y += stepY;
-                        tMaxY += tDeltaY;
-                        tempLookFace = new Vector3(0, -stepY, 0);
-                    }
-                    else
-                    {
-                        z += stepZ;
-                        tMaxZ += tDeltaZ;
-                        tempLookFace = new Vector3(0, 0, -stepZ);
-                    }
-                }
-
-                if (Block.getRender(w.getBlockData((int) Chunk.DATA.ID, x, y, z)))
-                {
-                    lookFace = tempLookFace;
-                    return new Vector3(x,y,z);
-                }
-                //else if (w.getBlockAt(x, y, z) != null)
-                //w.getBlockAt(x, y, z).setSolid(true);
-            }
-            return new Vector3(-1, -1, -1);
-        }
-         
-        private float mod(float value, float modulus)
-        {
-            return (value % modulus + modulus) % modulus;
-        }
-        private float intBound(float s, float ds)
-        {
-            if (ds < 0)
-            {
-                return intBound(-s, -ds);
-            }
-            else
-            {
-                s += 0.5f;
-                s = mod(s, 1);
-                return ((1f - (s)) / ds) - 0.5f;
-            }
-        }
-        private void doCameraGame()
-        {
-            Matrix a = Matrix.CreateRotationX(pitch) * Matrix.CreateRotationY(yaw);
-
-            Vector3 cameraOriginalTarget = new Vector3(0, 0, -1);
-            cameraRotatedTarget = Vector3.Transform(cameraOriginalTarget, a);
-            Vector3 cameraFinalTarget = camPos + cameraRotatedTarget;
-
-            Vector3 cameraOriginalUpVector = new Vector3(0, 1, 0);
-            Vector3 cameraRotatedUpVector = Vector3.Transform(cameraOriginalUpVector, a);
-
-            camDir.X = cameraRotatedTarget.X;
-            camDir.Y = cameraRotatedTarget.Z;
-            camDir.Normalize();
-
-            View = Matrix.CreateLookAt(camPos, cameraFinalTarget, cameraRotatedUpVector);
-
-            effect.View = View;
         }
         public void drawEntities(GameTime g)
         {
             billboardEffect.Parameters["world"].SetValue(Matrix.Identity);
             billboardEffect.Parameters["view"].SetValue(View);
             billboardEffect.Parameters["projection"].SetValue(Projection);
-            //billboardEffect.Parameters["colorMap"].SetValue(dogeTex);
             billboardEffect.Parameters["alphaTestDirection"].SetValue(1.0f);
 
-            //BasicEntity b = new BasicEntity(new Vector3(256, 120,256));
-            
             foreach (EffectPass pass in billboardEffect.Techniques["BillboardingCameraAligned"].Passes)
             {
                 foreach(Art.SpriteSheetEnhanced s in sheetManager.dict.Values)
@@ -511,7 +374,7 @@ namespace BradGame3D
             if (updateTimes.Count > 20)
                 updateTimes.RemoveAt(0);
             game.spriteBatch.Begin();
-            game.spriteBatch.DrawString(game.Content.Load<SpriteFont>("sego"), "x " + camPos.X + "\nz: " + camPos.Z + "\nFPS: " + 1/updateTimes.Average(), new Vector2(0, 0), Color.White);
+            game.spriteBatch.DrawString(game.Content.Load<SpriteFont>("sego"), "x " + mCam.camPos.X + "\nz: " + mCam.camPos.Z + "\nFPS: " + 1/updateTimes.Average(), new Vector2(0, 0), Color.White);
             game.spriteBatch.End();
         }
     }

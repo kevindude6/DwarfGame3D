@@ -107,7 +107,7 @@ namespace BradGame3D.Entities
                 lookDir.Y = velocity.Z;
                 lookDir.Normalize();
             }
-            Vector2 temp = new Vector2(w.game.camPos.X-center.X,w.game.camPos.Z-center.Z);
+            Vector2 temp = new Vector2(w.game.mCam.camPos.X-center.X,w.game.mCam.camPos.Z-center.Z);
             temp.Normalize();
             temp = Vector2.Negate(temp);
 

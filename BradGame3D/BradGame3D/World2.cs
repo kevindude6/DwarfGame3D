@@ -140,7 +140,7 @@ namespace BradGame3D
             {
                 if (brokedSectors[i] != null)
                 {
-                    float dist = (float)(Math.Pow((brokedSectors[i].c.chunkX*Chunk.xSize - game.camPos.X), 2) + Math.Pow((brokedSectors[i].c.chunkZ*Chunk.zSize - game.camPos.Z), 2) + Math.Pow((brokedSectors[i].yBase - game.camPos.Y), 2));
+                    float dist = (float)(Math.Pow((brokedSectors[i].c.chunkX*Chunk.xSize - game.mCam.camPos.X), 2) + Math.Pow((brokedSectors[i].c.chunkZ*Chunk.zSize - game.mCam.camPos.Z), 2) + Math.Pow((brokedSectors[i].yBase - game.mCam.camPos.Y), 2));
                     if (dist < minDist)
                     {
                         minDist = dist;
