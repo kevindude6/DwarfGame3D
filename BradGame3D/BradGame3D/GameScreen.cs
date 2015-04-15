@@ -21,6 +21,8 @@ namespace BradGame3D
         public Game1 game;
         public static World2 w;
 
+        float DEBUGnuments = 0;
+
         Thread chunkLoadingThread;
 
         const float rotationSpeed = 0.0075f;
@@ -136,7 +138,7 @@ namespace BradGame3D
         public void loadThings()
         {
             tex = game.Content.Load<Texture2D>("bradgameblocks");
-            treeTex = game.Content.Load<Texture2D>("treeGray");
+            treeTex = game.Content.Load<Texture2D>("floraspritesheet");
             dogeTex = game.Content.Load<Texture2D>("dogecoin-300");
 
             sheetManager = new Art.SpriteSheetManager(this);
@@ -230,8 +232,9 @@ namespace BradGame3D
                     Mouse.SetPosition(game.Window.ClientBounds.Width / 2, game.Window.ClientBounds.Height / 2);
 
                 }
+                Random r= new Random();
          
-                if (currentMouseState.LeftButton == ButtonState.Pressed && mouseReady)
+                if (currentMouseState.LeftButton == ButtonState.Pressed)
                 {
                     Vector3 a = blockCastTarget;
                     if (!Vector3.Equals(a, new Vector3(-1, -1, -1)))
@@ -239,11 +242,15 @@ namespace BradGame3D
                         //w.makeTree(a + lookFace);
                         SpriteSheetEnhanced tsheet;
                         sheetManager.dict.TryGetValue("Squirrel", out tsheet);
-                        test = new LivingEntity(a + lookFace + new Vector3(0, 2, 0), 100);
+                        test = new LivingEntity(a + lookFace + new Vector3((float) (r.NextDouble() - 0.5f), 2, (float) (r.NextDouble()-0.5f)), 100);
+                        test.velocity.X = (float) (r.NextDouble() * 10 - 5);
+                        test.velocity.Y = (float)(r.NextDouble() * 10 + 2);
+                        test.velocity.Z = (float)(r.NextDouble() * 10 - 5);
                         tsheet.addEnt(test);
                         Vector3 temp = a+lookFace;
                         //start = new AI.Pathing.Node((int)temp.X, (int)temp.Y,(int) temp.Z);
                         mouseReady = false;
+                        DEBUGnuments++;
 
                         
                         //w.setBlockData((byte)currentBlock,(int) Chunk.DATA.ID, temp);
@@ -368,13 +375,15 @@ namespace BradGame3D
                 mMouseIndicator.Draw(graphics);
             }
 
-            
+            //bounding boxes stuff
+
+          
 
             updateTimes.Add(g.ElapsedGameTime.TotalSeconds);
             if (updateTimes.Count > 20)
                 updateTimes.RemoveAt(0);
             game.spriteBatch.Begin();
-            game.spriteBatch.DrawString(game.Content.Load<SpriteFont>("sego"), "x " + mCam.camPos.X + "\nz: " + mCam.camPos.Z + "\nFPS: " + 1/updateTimes.Average(), new Vector2(0, 0), Color.White);
+            game.spriteBatch.DrawString(game.Content.Load<SpriteFont>("sego"), "x " + mCam.camPos.X + "\nz: " + mCam.camPos.Z + "\nFPS: " + 1/updateTimes.Average() + "\nNumber of ents: " + DEBUGnuments, new Vector2(0, 0), Color.White);
             game.spriteBatch.End();
         }
     }

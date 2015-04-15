@@ -96,8 +96,10 @@ namespace BradGame3D.Entities
                 else
                 {
                     currentAnim = anims[(int)ANIMSTATES.IDLE];
+                    velocity *= 0.2f;
 
                 }
+                
             }
 
 

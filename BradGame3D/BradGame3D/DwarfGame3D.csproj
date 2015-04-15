@@ -147,8 +147,9 @@
     <Compile Include="MenuThings\MenuComponent.cs" />
     <Compile Include="MenuThings\MenuScreen.cs" />
     <Compile Include="MenuThings\TerrainMenu.cs" />
-    <Compile Include="MouseIndicator.cs" />
+    <Compile Include="PlayerInteraction\MouseIndicator.cs" />
     <Compile Include="PlayerInteraction\Camera.cs" />
+    <Compile Include="PlayerInteraction\Utils.cs" />
     <Compile Include="RandomFunctions.cs" />
     <Compile Include="Region.cs" />
     <Compile Include="TerrainGeneration\Perlin.cs" />

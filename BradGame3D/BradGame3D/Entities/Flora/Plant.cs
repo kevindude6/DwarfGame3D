@@ -21,7 +21,7 @@ namespace BradGame3D.Entities.Flora
         protected VertexPositionColorTexture[] vertices;
         public Color mColor = Color.Red; 
         protected Chunk c;
-        BoundingBox bounds;
+        public BoundingBox bounds;
 
         public Plant()
         {

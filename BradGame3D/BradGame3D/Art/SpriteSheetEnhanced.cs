@@ -27,7 +27,10 @@ namespace BradGame3D.Art
         public void draw(GraphicsDeviceManager g)
         {
             foreach (BasicEntity b in ents)
-                b.draw(g, this.s);
+            {
+                if(b.parentChunk.isVisible)
+                    b.draw(g, this.s);
+            }
         }
         public void addEnt(BasicEntity b)
         {

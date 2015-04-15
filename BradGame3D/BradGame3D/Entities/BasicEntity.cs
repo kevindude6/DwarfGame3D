@@ -5,11 +5,16 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using BradGame3D.Art;
+using System.Diagnostics;
 
 namespace BradGame3D.Entities
 {
     public class BasicEntity
     {
+        public Chunk parentChunk;
+
+        public float lastX;
+        public float lastZ;
         public Vector3 center;
         public float width = 1f;
         public float height = 1f;
@@ -22,7 +27,8 @@ namespace BradGame3D.Entities
         public BasicEntity(Vector3 pos)
         {
             center = pos;
-
+            lastX = center.X;
+            lastZ = center.Z;
             vertices[0] = new BillboardVertex(pos, new Vector2(0, 0), new Vector2(-width/2, height/2));
             vertices[1] = new BillboardVertex(pos, new Vector2(1, 0), new Vector2(width/2, height/2));
             vertices[2] = new BillboardVertex(pos, new Vector2(0, 1), new Vector2(-width/2, -height/2));
@@ -48,6 +54,10 @@ namespace BradGame3D.Entities
         }
         public virtual void update(float gameTime, World2 w)
         {
+            if (parentChunk == null)
+            {
+                w.addEntToChunk(this);
+            }
             /*
             for (int a = -1; a < 2; a++)
             {
@@ -67,6 +77,15 @@ namespace BradGame3D.Entities
             }
              * */
 
+            
+            if ((int) (center.X / Chunk.xSize) != (int) (lastX / Chunk.xSize) || (int) (center.Z / Chunk.zSize) != (int) (lastZ / Chunk.zSize))
+            {
+                parentChunk.ents.Remove(this);
+                w.addEntToChunk(this);
+               // Debug.WriteLine("Ent moved over");
+            }
+            lastX = center.X;
+            lastZ = center.Z;
             animTime += gameTime;
         }
 

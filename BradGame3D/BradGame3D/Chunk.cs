@@ -20,6 +20,7 @@ namespace BradGame3D
         public const int zSize = 16;
         public const int sectorCount = ySize/BlockSector.ySize;
 
+        public List<Entities.BasicEntity> ents = new List<Entities.BasicEntity>();
         public BlockSector[] sectors = new BlockSector[sectorCount];
         [XmlIgnoreAttribute]
         public int chunkX;
@@ -27,7 +28,7 @@ namespace BradGame3D
         public int chunkZ;
 
         public int blockCount;
-        List<Plant> floraList = new List<Plant>();
+        public List<Plant> floraList = new List<Plant>();
         public VertexPositionColorTexture[] floraVertices;
         public bool floraReady = false;
         public bool isVisible = true;

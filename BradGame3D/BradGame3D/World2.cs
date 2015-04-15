@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using BradGame3D.Entities.Flora;
+using BradGame3D.Entities;
 namespace BradGame3D
 {
     public class World2
@@ -222,7 +223,14 @@ namespace BradGame3D
                             {
                                 g.GraphicsDevice.DrawUserPrimitives<VertexPositionColorTexture>(PrimitiveType.TriangleList, c.floraVertices, 0, c.floraVertices.Length / 3);
                             }
+                            /*
+                            foreach (Plant p in c.floraList)
+                            {
+                                PlayerInteraction.Utils.drawWireBoundingBox(g, p.bounds);
+                            }
+                             */
                         }
+                       
                     }
                 }
             }
@@ -241,6 +249,27 @@ namespace BradGame3D
             }
             else
                 return 1;
+        }
+        public bool addEntToChunk(BasicEntity ent)
+        {
+
+            int cx = (int) (ent.center.X / Chunk.xSize);
+            int cz = (int) (ent.center.Z / Chunk.zSize);
+
+            if (cz >= 0 && cz < worldSize && cx >= 0 && cx < worldSize)
+            {
+                Chunk c = chunks[cz][cx];
+                if (c != null)
+                {
+                    c.ents.Add(ent);
+                    ent.parentChunk = c;
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else
+                return false;
         }
         public byte getBlockData(int datatype, Vector3 a)
         {
