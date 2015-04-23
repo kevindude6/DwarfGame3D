@@ -41,6 +41,10 @@ namespace BradGame3D.AI.Pathing
             {
                 return null;
             }
+            if (w.isSolid(end.x, end.y - 2, end.z) == false)
+            {
+                return null;
+            }
             EnhancedNode st = new EnhancedNode(start.x, start.y, start.z);
             st.cost = 0;
             st.parent = null;
@@ -76,7 +80,7 @@ namespace BradGame3D.AI.Pathing
 
                         }
                          */
-                        if (!GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y, n.z)].getSolid())
+                        if (!GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y, n.z)].getSolid() && w.isSolid(n.x,n.y-1,n.z))
                         {
                             float newCost = current.cost + getHeuristic(current, n.toNode());
 

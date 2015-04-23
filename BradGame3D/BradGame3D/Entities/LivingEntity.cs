@@ -12,12 +12,12 @@ namespace BradGame3D.Entities
     public class LivingEntity : BasicEntity
     {
         public float health;
-        bool isOnGround = false;
-        public Vector3 velocity = new Vector3(0, 0, 0);
+      
         public Vector2 lookDir = new Vector2(1,0);
         public float runSpeed=5f;
         public float walkSpeed=2f;
-        public float mass = 75;
+        public float jumpForce = 600;
+       
         public float currentSpeed = 0;
         static string[] anims = new string[] { "Idle", "Walk" };
         public Path currentPath = null;
@@ -46,6 +46,7 @@ namespace BradGame3D.Entities
             base.update(gameTime,w);
 
             currentLook = SpriteSheet.Direction.TOWARD;
+            /*
             Vector3 footPos = center + new Vector3(0,-height/2,0);
             bool solidFeet = GameScreen.blockDataManager.blocks[w.getBlockData((int) Chunk.DATA.ID,(int) Math.Round(footPos.X),(int) Math.Round(footPos.Y),(int) Math.Round(footPos.Z))].getSolid();
             if (solidFeet)
@@ -58,15 +59,15 @@ namespace BradGame3D.Entities
             {
                 velocity.Y -= 0.03f;
             }
+             */
 
 
-            if (isOnGround)
-            {
+            
                 if (followingPath)
                 {
                     currentAnim = anims[(int)ANIMSTATES.WALK];
 
-                    if (currentPath.nodeList.ElementAt(0).distTo(center) < 0.4f)
+                    if (currentPath.nodeList.ElementAt(0).distTo(center) < width/2)
                     {
                         currentPath.nodeList.RemoveAt(0);
                     }
@@ -83,25 +84,50 @@ namespace BradGame3D.Entities
 
                         dir.Normalize();
                         dir = dir * runSpeed;
+                       
                         Vector3 steeringForce = dir - velocity;
-                        steeringForce /= mass;
-                        velocity = steeringForce + velocity;
-                        if (velocity.Length() > runSpeed)
+                        //steeringForce /= mass;
+                        //velocity = steeringForce + velocity;
+                        if (isOnGround)
                         {
-                            velocity.Normalize();
-                            velocity = velocity * runSpeed;
+                            addForce(steeringForce * mass * 10);
+                            if (velocity.Length() > runSpeed)
+                            {
+                                velocity.Normalize();
+                                velocity = velocity * runSpeed;
+                            }
+                            if (dir.Y > 0)
+                            {
+                                //addForce(new Vector3(0, 1000, 0));
+                                velocity.Y += 5.2f;
+                                isOnGround = false;
+                            }
                         }
+                        else
+                        {
+                            steeringForce.Y = 0;
+                            addForce(steeringForce * mass * 5);
+                        }
+
+                       
                     }
                 }
                 else
                 {
-                    currentAnim = anims[(int)ANIMSTATES.IDLE];
-                    velocity *= 0.2f;
+                    if (isOnGround)
+                    {
+                        currentAnim = anims[(int)ANIMSTATES.IDLE];
+                        addForce(velocity * -mass * 7);
+                    }
 
                 }
-                
-            }
 
+                if (!isOnGround)
+                {
+                    addForce(new Vector3(0, -10 * mass, 0));
+                }
+
+               
 
             if (velocity.LengthSquared() != 0)
             {
@@ -140,9 +166,9 @@ namespace BradGame3D.Entities
                 }
             }
 
-          
-            center += velocity * (gameTime/1000f);
-            
+
+
+            //center += velocity * (gameTime / 1000f);
 
         }
     }

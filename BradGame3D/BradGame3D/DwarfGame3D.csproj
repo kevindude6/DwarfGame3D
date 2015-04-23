@@ -126,6 +126,7 @@
     <Compile Include="AI\Pathing\Node.cs" />
     <Compile Include="AI\Pathing\Path.cs" />
     <Compile Include="AI\Pathing\Pathing.cs" />
+    <Compile Include="AI\Pathing\PathingManager.cs" />
     <Compile Include="Art\SpriteSheetEnhanced.cs" />
     <Compile Include="Art\SpriteSheetManager.cs" />
     <Compile Include="BlockSector.cs" />

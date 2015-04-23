@@ -21,11 +21,13 @@ namespace BradGame3D
         public Game1 game;
         public static World2 w;
 
+        float camSpeedMod = 20;
         float DEBUGnuments = 0;
 
         Thread chunkLoadingThread;
+        Thread pathingThread;
 
-        const float rotationSpeed = 0.0075f;
+        const float rotationSpeed = 0.005f;
 
         public Matrix View;
         public Matrix Projection;
@@ -54,7 +56,7 @@ namespace BradGame3D
         public AI.Pathing.Node start = null;
         public AI.Pathing.Node end = null;
         public MouseIndicator mMouseIndicator;
-
+        Random r;
         public bool loadedChunkThisFrame = false;
 
         private List<double> updateTimes = new List<double>();
@@ -100,7 +102,7 @@ namespace BradGame3D
             
             w = new World2(this);
 
-           
+            r = new Random();
 
             Mouse.SetPosition(game.Window.ClientBounds.Width / 2, game.Window.ClientBounds.Height / 2);
             originalMouseState = Mouse.GetState();
@@ -130,6 +132,11 @@ namespace BradGame3D
             chunkLoadingThread = new Thread(new ThreadStart(w.fixChunks));
             chunkLoadingThread.IsBackground = true;
             chunkLoadingThread.Start();
+
+            AI.Pathing.PathingManager.w = w;
+            pathingThread = new Thread(new ThreadStart(AI.Pathing.PathingManager.findPaths));
+            pathingThread.IsBackground = true;
+            pathingThread.Start();
 
             loadThings();
             mCam = new Camera(this,w,graphics, new Vector3(256,150,256));
@@ -232,7 +239,7 @@ namespace BradGame3D
                     Mouse.SetPosition(game.Window.ClientBounds.Width / 2, game.Window.ClientBounds.Height / 2);
 
                 }
-                Random r= new Random();
+                
          
                 if (currentMouseState.LeftButton == ButtonState.Pressed)
                 {
@@ -243,9 +250,11 @@ namespace BradGame3D
                         SpriteSheetEnhanced tsheet;
                         sheetManager.dict.TryGetValue("Squirrel", out tsheet);
                         test = new LivingEntity(a + lookFace + new Vector3((float) (r.NextDouble() - 0.5f), 2, (float) (r.NextDouble()-0.5f)), 100);
+                        
                         test.velocity.X = (float) (r.NextDouble() * 10 - 5);
                         test.velocity.Y = (float)(r.NextDouble() * 10 + 2);
                         test.velocity.Z = (float)(r.NextDouble() * 10 - 5);
+                        
                         tsheet.addEnt(test);
                         Vector3 temp = a+lookFace;
                         //start = new AI.Pathing.Node((int)temp.X, (int)temp.Y,(int) temp.Z);
@@ -271,8 +280,18 @@ namespace BradGame3D
 
                         //w.setBlockData((byte)0, (int)Chunk.DATA.ID, a);
                         
-                        test.followPath(AI.Pathing.Pathing.findPath(test.center,temp,w));
-                        
+                        //test.followPath(AI.Pathing.Pathing.findPath(test.center,temp,w));
+                        SpriteSheetEnhanced tsheet;
+                        sheetManager.dict.TryGetValue("Squirrel", out tsheet);
+                        foreach (LivingEntity e in tsheet.ents)
+                        {
+                            AI.Pathing.PathData p;
+                            p.start = e.center;
+                            p.end = temp;
+                            p.b = e;
+                            AI.Pathing.PathingManager.data.Add(p);
+                        }
+                       
                         mouseReady = false;
                         /*
                         if (start != null && end != null)
@@ -310,16 +329,16 @@ namespace BradGame3D
             Vector3 flatCamTargetRot = new Vector3(flatCamTarget.Z,0,-flatCamTarget.X);
            
             if (k.IsKeyDown(Keys.W))
-                mCam.camPos += (flatCamTarget)*(float) gameTime.ElapsedGameTime.TotalSeconds*40f;
+                mCam.camPos += (flatCamTarget)*(float) gameTime.ElapsedGameTime.TotalSeconds*camSpeedMod;
             if (k.IsKeyDown(Keys.S))
-                mCam.camPos += flatCamTarget* (float)gameTime.ElapsedGameTime.TotalSeconds*-40f;
+                mCam.camPos += flatCamTarget* (float)gameTime.ElapsedGameTime.TotalSeconds*-camSpeedMod;
             if (k.IsKeyDown(Keys.A))
             {
-                mCam.camPos += (flatCamTargetRot) * (float)gameTime.ElapsedGameTime.TotalSeconds * 40f;
+                mCam.camPos += (flatCamTargetRot) * (float)gameTime.ElapsedGameTime.TotalSeconds * camSpeedMod;
             }
             if (k.IsKeyDown(Keys.D))
             {
-                mCam.camPos += (flatCamTargetRot) * (float)gameTime.ElapsedGameTime.TotalSeconds * -40f;
+                mCam.camPos += (flatCamTargetRot) * (float)gameTime.ElapsedGameTime.TotalSeconds * -camSpeedMod;
             }
 
             oldKeyState = k;
