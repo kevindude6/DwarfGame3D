@@ -136,6 +136,7 @@
     <Compile Include="Block.cs" />
     <Compile Include="Entities\BasicEntity.cs" />
     <Compile Include="Entities\BillboardStuff.cs" />
+    <Compile Include="Entities\Creatures\Human.cs" />
     <Compile Include="Entities\Dwarf.cs" />
     <Compile Include="Entities\Flora\Shrub.cs" />
     <Compile Include="Entities\Flora\Plant.cs" />

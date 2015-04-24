@@ -22,7 +22,7 @@ namespace BradGame3D
         }
         public static Color randSaturatedColor(Random r)
         {
-            /*
+            
             //http://stackoverflow.com/questions/8476841/how-to-random-generate-fully-saturated-colors-only
              int[] rgb = new int[3];
              rgb[0] = r.Next(256);  // red
@@ -48,7 +48,8 @@ namespace BradGame3D
             rgb[max] = 255;
             rgb[min] = 0;
             return new Color(rgb[0],rgb[1],rgb[2]);
-             */
+             
+            /*
             int a = r.Next(0, 4);
             switch (a)
             {
@@ -58,6 +59,7 @@ namespace BradGame3D
                 case 3: return Color.Yellow;
             }
             return Color.OrangeRed;
+             */
         }
     }
 }

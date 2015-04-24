@@ -17,8 +17,10 @@ namespace BradGame3D.Entities
         public float lastY;
         public float lastZ;
         public Vector3 center;
-        public float width = 1f;
-        public float height = 1f;
+        public float renderWidth = 0.5f;
+        public float collideRadius = 0.25f;
+        public float height = 0.5f;
+        public float collideSquared;
         protected Vector3 netF = new Vector3();
 
         public bool isOnGround = false;
@@ -31,26 +33,32 @@ namespace BradGame3D.Entities
         BillboardVertex[] vertices = new BillboardVertex[6];
         public SpriteSheet.Direction currentLook = SpriteSheet.Direction.RIGHT;
 
+        public static string SheetName = "Squirrel";
+
         public BasicEntity(Vector3 pos)
         {
+            //collideRadius = renderWidth / 2;
+
+            initSize();
+            collideSquared = collideRadius * collideRadius;
             center = pos;
             lastX = center.X;
             lastY = center.Y;
             lastZ = center.Z;
-            vertices[0] = new BillboardVertex(pos, new Vector2(0, 0), new Vector2(-width/2, height/2));
-            vertices[1] = new BillboardVertex(pos, new Vector2(1, 0), new Vector2(width/2, height/2));
-            vertices[2] = new BillboardVertex(pos, new Vector2(0, 1), new Vector2(-width/2, -height/2));
+            vertices[0] = new BillboardVertex(pos, new Vector2(0, 0), new Vector2(-renderWidth/2, height/2));
+            vertices[1] = new BillboardVertex(pos, new Vector2(1, 0), new Vector2(renderWidth/2, height/2));
+            vertices[2] = new BillboardVertex(pos, new Vector2(0, 1), new Vector2(-renderWidth/2, -height/2));
             vertices[3] = vertices[2];
             vertices[4] = vertices[1];
-            vertices[5] = new BillboardVertex(pos, new Vector2(1, 1), new Vector2(width/2, -height/2));
+            vertices[5] = new BillboardVertex(pos, new Vector2(1, 1), new Vector2(renderWidth/2, -height/2));
            
 
             //updateVertices();
-            init();
+            //init();
         }
-        public virtual void init()
+        public virtual void initSize()
         {
-
+            
         }
         public void addForce(Vector3 force)
         {
@@ -71,17 +79,17 @@ namespace BradGame3D.Entities
             float xPen = 9999;
             float yPen = 9999;
             float zPen = 9999;
-            if (Math.Abs(center.X - x) < width / 2 + 0.5f)
+            if (Math.Abs(center.X - x) < collideRadius / 2 + 0.5f)
             {
-                xPen = (width / 2 + 0.5f) - (Math.Abs(center.X - x));
+                xPen = (collideRadius / 2 + 0.5f) - (Math.Abs(center.X - x));
             }
             if (Math.Abs(center.Y - y) < height / 2 + 0.5f)
             {
                 yPen = (height / 2 + 0.5f) - (Math.Abs(center.Y- y));
             }
-            if (Math.Abs(center.Z - z) < width / 2 + 0.5f)
+            if (Math.Abs(center.Z - z) < collideRadius / 2 + 0.5f)
             {
-                zPen = (width / 2 + 0.5f) - (Math.Abs(center.Z - z));
+                zPen = (collideRadius / 2 + 0.5f) - (Math.Abs(center.Z - z));
             }
 
             if (xPen == 9999 && yPen == 9999 && zPen == 9999)
@@ -94,9 +102,9 @@ namespace BradGame3D.Entities
                 {
                     //center.X = lastX;
                     if (center.X < x)
-                        center.X = x - 0.5f - width / 2;
+                        center.X = x - 0.5f - collideRadius / 2;
                     else
-                        center.X = x + 0.5f + width / 2;
+                        center.X = x + 0.5f + collideRadius / 2;
                     velocity.X = 0;
                     return true;
                 }
@@ -115,9 +123,9 @@ namespace BradGame3D.Entities
                 {
                     //center.Z = lastZ;
                     if (center.Z > z)
-                        center.Z = z + 0.5f + width / 2;
+                        center.Z = z + 0.5f + collideRadius / 2;
                     else
-                        center.Z = z - 0.5f - width/2;
+                        center.Z = z - 0.5f - collideRadius/2;
                     velocity.Z = 0;
                     return true;
                 }
@@ -136,19 +144,7 @@ namespace BradGame3D.Entities
             int y = (int)Math.Round(center.Y);
             int z = (int)Math.Round(center.Z);
            
-            /*
-            if (w.isSolid(x, y, z))
-            {
-                if (collidesWithBlock(x, y, z))
-                {
-                    isOnGround = true;
-                }
-                else
-                    isOnGround = false;
-            }
-            else
-                isOnGround = false;
-            */
+            /* block nonsense */
 
             //BLOCK BELOW
             if (Math.Abs(center.Y - (y - 1)) < height / 2 + 0.5f)
@@ -168,48 +164,78 @@ namespace BradGame3D.Entities
             
 
             // X - 1
-            if (Math.Abs(center.X - (x - 1)) < width / 2 + 0.5f)
+            if (Math.Abs(center.X - (x - 1)) < collideRadius / 2 + 0.5f)
             {
                 if(w.isSolid(x-1,y,z))
                 {
-                    center.X = (x - 1) + width / 2 + 0.5f;
+                    center.X = (x - 1) + collideRadius / 2 + 0.5f;
                     velocity.X = 0;
                 }
             }
 
             // X + 1
-            if (Math.Abs(center.X - (x + 1)) < width / 2 + 0.5f)
+            if (Math.Abs(center.X - (x + 1)) < collideRadius / 2 + 0.5f)
             {
                 if (w.isSolid(x + 1, y, z))
                 {
-                    center.X = (x + 1) - width / 2 - 0.5f;
+                    center.X = (x + 1) - collideRadius / 2 - 0.5f;
                     velocity.X = 0;
                 }
             }
             
             // Z -1
-            if (Math.Abs(center.Z - (z-1)) < width / 2 + 0.5f)
+            if (Math.Abs(center.Z - (z-1)) < collideRadius / 2 + 0.5f)
             {
                 if (w.isSolid(x, y, z-1))
                 {
-                    center.Z = (z - 1) + width / 2 + 0.5f;
+                    center.Z = (z - 1) + collideRadius / 2 + 0.5f;
                     velocity.Z = 0;
                 }
             }
             // Z + 1
-            if (Math.Abs(center.Z - (z + 1)) < width / 2 + 0.5f)
+            if (Math.Abs(center.Z - (z + 1)) < collideRadius / 2 + 0.5f)
             {
                 if (w.isSolid(x, y, z + 1))
                 {
-                    center.Z = (z + 1) - width / 2 - 0.5f;
+                    center.Z = (z + 1) - collideRadius / 2 - 0.5f;
                     velocity.Z = 0;
                 }
             }
              
+            //Other Entities
+
+            foreach (BasicEntity e in parentChunk.ents)
+            {
+                if (e != this)
+                {
+                    if (distSquared(this, e) < collideSquared + e.collideSquared)
+                    {
+                        float a = flatDistSquared(this, e);
+                        if (a < collideSquared + e.collideSquared)
+                        {
+                            float penetration = collideSquared + e.collideSquared - a;
+                            Vector3 dir = center - e.center;
+                            dir.Normalize();
+                            this.addForce(dir * penetration * mass*50);
+                            e.addForce(dir * -1 * penetration * e.mass*50);
+                        }
+                    }
+                }
+            }
          
          
              
         }
+        public static float distSquared(BasicEntity a, BasicEntity b)
+        {
+            return (float)(Math.Pow((a.center.X - b.center.X), 2) + Math.Pow((a.center.Y - b.center.Y), 2) + Math.Pow((a.center.Z - b.center.Z), 2));
+
+        }
+        public static float flatDistSquared(BasicEntity a, BasicEntity b)
+        {
+            return (float)(Math.Pow((a.center.X - b.center.X), 2) + Math.Pow((a.center.Z - b.center.Z), 2));
+        }
+
         public virtual void update(float gameTime, World2 w)
         {
             if (parentChunk == null)
@@ -243,12 +269,12 @@ namespace BradGame3D.Entities
             int tile = s.getTile(currentAnim,currentLook,ref animTime);
             
 
-            vertices[0] = new BillboardVertex(center, s.getTexCoords(tile,SpriteSheet.Corner.TL), new Vector2(-width / 2, height / 2));
-            vertices[1] = new BillboardVertex(center, s.getTexCoords(tile, SpriteSheet.Corner.TR), new Vector2(width / 2, height / 2));
-            vertices[2] = new BillboardVertex(center, s.getTexCoords(tile, SpriteSheet.Corner.BL), new Vector2(-width / 2, -height / 2));
+            vertices[0] = new BillboardVertex(center, s.getTexCoords(tile,SpriteSheet.Corner.TL), new Vector2(-renderWidth / 2, height / 2));
+            vertices[1] = new BillboardVertex(center, s.getTexCoords(tile, SpriteSheet.Corner.TR), new Vector2(renderWidth / 2, height / 2));
+            vertices[2] = new BillboardVertex(center, s.getTexCoords(tile, SpriteSheet.Corner.BL), new Vector2(-renderWidth / 2, -height / 2));
             vertices[3] = vertices[2];
             vertices[4] = vertices[1];
-            vertices[5] = new BillboardVertex(center, s.getTexCoords(tile, SpriteSheet.Corner.BR), new Vector2(width / 2, -height / 2));
+            vertices[5] = new BillboardVertex(center, s.getTexCoords(tile, SpriteSheet.Corner.BR), new Vector2(renderWidth / 2, -height / 2));
 
         }
         public virtual void draw(GraphicsDeviceManager g, SpriteSheet s)

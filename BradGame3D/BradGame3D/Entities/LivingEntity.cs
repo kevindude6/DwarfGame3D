@@ -11,23 +11,29 @@ namespace BradGame3D.Entities
 {
     public class LivingEntity : BasicEntity
     {
-        public float health;
+        public float health = 100;
       
         public Vector2 lookDir = new Vector2(1,0);
         public float runSpeed=5f;
         public float walkSpeed=2f;
         public float jumpForce = 600;
-       
+        public float pathTolerance = 1f;
         public float currentSpeed = 0;
         static string[] anims = new string[] { "Idle", "Walk" };
         public Path currentPath = null;
         public bool followingPath = false;
         public enum ANIMSTATES {IDLE,WALK};
+        new public static string SheetName = "Squirrel";
         
         public LivingEntity(Vector3 pos, float tHealth) : base(pos)
         {
             health = tHealth;
         }
+        public LivingEntity(Vector3 pos): base(pos)
+        {
+
+        }
+
         public void followPath(Path p)
         {
             if (p != null)
@@ -67,7 +73,7 @@ namespace BradGame3D.Entities
                 {
                     currentAnim = anims[(int)ANIMSTATES.WALK];
 
-                    if (currentPath.nodeList.ElementAt(0).distTo(center) < width/2)
+                    if (currentPath.nodeList.ElementAt(0).distTo(center) < pathTolerance)
                     {
                         currentPath.nodeList.RemoveAt(0);
                     }
@@ -80,6 +86,9 @@ namespace BradGame3D.Entities
                     else
                     {
                         Node n = currentPath.nodeList.ElementAt(0);
+                        //int x = (int)Math.Round(center.X);
+                        int y = (int)Math.Round(center.Y);
+                        //int z = (int)Math.Round(center.Z);
                         Vector3 dir = new Vector3(n.x - center.X, n.y - center.Y, n.z - center.Z);
 
                         dir.Normalize();
@@ -96,7 +105,7 @@ namespace BradGame3D.Entities
                                 velocity.Normalize();
                                 velocity = velocity * runSpeed;
                             }
-                            if (dir.Y > 0)
+                            if (n.y>y)
                             {
                                 //addForce(new Vector3(0, 1000, 0));
                                 velocity.Y += 5.2f;

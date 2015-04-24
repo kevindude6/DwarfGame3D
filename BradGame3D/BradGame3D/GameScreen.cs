@@ -139,7 +139,7 @@ namespace BradGame3D
             pathingThread.Start();
 
             loadThings();
-            mCam = new Camera(this,w,graphics, new Vector3(256,150,256));
+            mCam = new Camera(this,w,graphics, new Vector3(256,120,256));
 
         }
         public void loadThings()
@@ -150,7 +150,7 @@ namespace BradGame3D
 
             sheetManager = new Art.SpriteSheetManager(this);
             sheetManager.loadSheet("Sprite_creature_squirrel",w);
-            sheetManager.loadSheet("pathindicator",w);
+            sheetManager.loadSheet("Sprite_creature_human",w);
         }
         public void updateFrustum()
         {
@@ -179,7 +179,7 @@ namespace BradGame3D
             {
                 mouseEnabled = false;
             }
-            if (k.IsKeyDown(Keys.M) && oldKeyState.IsKeyUp(Keys.M) && !mouseEnabled)
+            else if (k.IsKeyDown(Keys.M) && oldKeyState.IsKeyUp(Keys.M) && !mouseEnabled)
             {
                 mouseEnabled = true;
             }
@@ -221,6 +221,19 @@ namespace BradGame3D
             if (k.IsKeyDown(Keys.D4)) currentBlock = 4;
             if (k.IsKeyDown(Keys.D5)) currentBlock = 5;
             if (k.IsKeyDown(Keys.D6)) currentBlock = 6;
+
+            if (k.IsKeyDown(Keys.C))
+            {
+                Vector3 a = blockCastTarget;
+                if (currentBlock == 0)
+                {
+                    w.setBlockData((byte)currentBlock, (int)Chunk.DATA.ID, a);
+                }
+                else
+                {
+                    w.setBlockData((byte)currentBlock, (int)Chunk.DATA.ID, a+lookFace);
+                }
+            }
            
 
             MouseState currentMouseState = Mouse.GetState();
@@ -248,13 +261,18 @@ namespace BradGame3D
                     {
                         //w.makeTree(a + lookFace);
                         SpriteSheetEnhanced tsheet;
-                        sheetManager.dict.TryGetValue("Squirrel", out tsheet);
-                        test = new LivingEntity(a + lookFace + new Vector3((float) (r.NextDouble() - 0.5f), 2, (float) (r.NextDouble()-0.5f)), 100);
+                        sheetManager.dict.TryGetValue(Entities.Creatures.Human.SheetName, out tsheet);
+                        test = new Entities.Creatures.Human(a + lookFace + new Vector3((float) (r.NextDouble() - 0.5f), 2, (float) (r.NextDouble()-0.5f)), 100);
                         
-                        test.velocity.X = (float) (r.NextDouble() * 10 - 5);
-                        test.velocity.Y = (float)(r.NextDouble() * 10 + 2);
-                        test.velocity.Z = (float)(r.NextDouble() * 10 - 5);
-                        
+                        //test.velocity.X = (float) (r.NextDouble() * 10 - 5);
+                        //test.velocity.Y = (float)(r.NextDouble() * 10 + 2);
+                        //test.velocity.Z = (float)(r.NextDouble() * 10 - 5);
+                        /*
+                        test.renderWidth = RandomFunctions.Normal(r, 0.15f, 0.5f);
+                        test.collideRadius = test.renderWidth / 2;
+                        test.collideSquared = test.collideRadius * test.collideRadius;
+                        test.height = RandomFunctions.Normal(r, 0.05f, 0.5f);
+                         * */
                         tsheet.addEnt(test);
                         Vector3 temp = a+lookFace;
                         //start = new AI.Pathing.Node((int)temp.X, (int)temp.Y,(int) temp.Z);
@@ -282,7 +300,8 @@ namespace BradGame3D
                         
                         //test.followPath(AI.Pathing.Pathing.findPath(test.center,temp,w));
                         SpriteSheetEnhanced tsheet;
-                        sheetManager.dict.TryGetValue("Squirrel", out tsheet);
+                        sheetManager.dict.TryGetValue(Entities.Creatures.Human.SheetName, out tsheet);
+                        AI.Pathing.PathingManager.data.Clear();
                         foreach (LivingEntity e in tsheet.ents)
                         {
                             AI.Pathing.PathData p;

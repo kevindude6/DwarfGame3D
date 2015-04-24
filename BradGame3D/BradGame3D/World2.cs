@@ -14,7 +14,7 @@ namespace BradGame3D
     {
         public const int seed = 567898765;
         Random r = new Random(seed);
-        public const int chunkCount = 25;
+        public const int chunkCount = 32;
         public const int worldSize = 32;
         public bool initialized = false;
         public List<BlockSector> brokedSectors = new List<BlockSector>();
@@ -183,7 +183,7 @@ namespace BradGame3D
             {
                 for (int x = -(chunkCount-1)/2; x <= (chunkCount-1)/2; x++)
                 {
-                    if (z + chunkZ >= 0 && z + chunkZ < worldSize && x + chunkX >= 0 && x + chunkX < worldSize)
+                    if (z + chunkZ >= 0 && z + chunkZ <= worldSize && x + chunkX >= 0 && x + chunkX <= worldSize)
                     {
                         Chunk c = chunks[z + chunkZ][x + chunkX];
                         if (c != null)
@@ -279,13 +279,16 @@ namespace BradGame3D
         {
             int cx = x / Chunk.xSize;
             int cz = z / Chunk.zSize;
-            Chunk c = chunks[cz][cx];
-            if (cz >= 0 && cz < worldSize && cx >= 0 && cx < worldSize && c != null && z >= 0 && x >= 0 && y >= 0 && y < Chunk.ySize && (x - cx * Chunk.xSize) < Chunk.xSize && (z - cz * Chunk.zSize) < Chunk.zSize)
+            if (isViableChunk(cx, cz))
             {
-                c.setBlockData(datatype, val, x, y, z);
-                
+                Chunk c = chunks[cz][cx];
+                if (cz >= 0 && cz < worldSize && cx >= 0 && cx < worldSize && c != null && z >= 0 && x >= 0 && y >= 0 && y < Chunk.ySize && (x - cx * Chunk.xSize) < Chunk.xSize && (z - cz * Chunk.zSize) < Chunk.zSize)
+                {
+                    c.setBlockData(datatype, val, x, y, z);
+
+                }
+                updateBlock(x, y, z);
             }
-            updateBlock(x, y, z);
             
         }
         public void setBlockData(byte val, int datatype, Vector3 a)

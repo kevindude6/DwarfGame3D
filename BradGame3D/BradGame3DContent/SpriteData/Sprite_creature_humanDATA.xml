@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <!-- TODO: replace this Asset with your own XML asset data. -->
+  <Asset Type="BradGame3D.Art.SpriteSheet">
+    <name>Human</name>
+    <animationTiles>
+      <Item>0 1000</Item>
+      <Item>1 167 2 333 3 500</Item>
+    </animationTiles>
+    <animationNames>
+      <Item>Idle</Item>
+      <Item>Walk</Item>
+    </animationNames>
+    <widthPx>128</widthPx>
+    <heightPx>192</heightPx>
+    <tileWidth>32</tileWidth>
+    <tileHeight>48</tileHeight>
+    <fileName>Sprite_creature_human</fileName>
+    
+  </Asset>
+</XnaContent>

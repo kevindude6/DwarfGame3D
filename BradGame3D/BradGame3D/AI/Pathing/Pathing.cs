@@ -27,7 +27,8 @@ namespace BradGame3D.AI.Pathing
 
     public class Pathing
     {
-        public static EnhancedNode[] temp = new EnhancedNode[26];
+      //  public static EnhancedNode[] temp = new EnhancedNode[26];
+        public static EnhancedNode[] temp = new EnhancedNode[22];
         public static Path findPath(Vector3 start, Vector3 end, World2 w)
         {
             return findPath(new Node((int)Math.Round(start.X), (int)Math.Round(start.Y), (int)Math.Round(start.Z)), new Node((int)Math.Round(end.X), (int)Math.Round(end.Y), (int)Math.Round(end.Z)), w);
@@ -53,11 +54,16 @@ namespace BradGame3D.AI.Pathing
             EnhancedNode tempEnd = null ;
             int count = 0;
 
-            Debug.WriteLine("Start = " + st.toNode().ToString());
-            Debug.WriteLine("End = " + end.ToString());
-
+            //Debug.WriteLine("Start = " + st.toNode().ToString());
+           // Debug.WriteLine("End = " + end.ToString());
+            
             while (finding)
             {
+                if (openList.Count() == 0)
+                {
+                    finding = false;
+                    return null;
+                }
                 EnhancedNode current = openList.First().Value;
                 if (current.Equals(end))
                 {
@@ -70,16 +76,7 @@ namespace BradGame3D.AI.Pathing
                     foreach (EnhancedNode t in temp)
                     {
                         EnhancedNode n = new EnhancedNode(t.x,t.y,t.z);
-                        /*
-                        if (GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y, n.z)].getSolid())
-                        {
-
-                        }
-                        else if (!GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y - 1, n.z)].getSolid())
-                        {
-
-                        }
-                         */
+                       
                         if (!GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y, n.z)].getSolid() && w.isSolid(n.x,n.y-1,n.z))
                         {
                             float newCost = current.cost + getHeuristic(current, n.toNode());
@@ -221,7 +218,7 @@ namespace BradGame3D.AI.Pathing
                     {
                         for (int z = -1; z < 2; z++)
                         {
-                            if (x == 0 && y == 0 && z == 0)
+                            if ((x == 0 && y == 0 && z == 0) || (y==0 && x!=0 && z!= 0))
                             {
                             }
                             else
@@ -232,23 +229,6 @@ namespace BradGame3D.AI.Pathing
                         }
                     }
                 }
-                
-
-                            /*
-                temp[0] = new EnhancedNode(n.x + 1, n.y, n.z);
-                temp[1] = new EnhancedNode(n.x - 1, n.y, n.z);
-                temp[2] = new EnhancedNode(n.x, n.y + 1, n.z);
-                temp[3] = new EnhancedNode(n.x, n.y - 1, n.z);
-                temp[4] = new EnhancedNode(n.x, n.y, n.z + 1);
-                temp[5] = new EnhancedNode(n.x, n.y, n.z - 1);
-
-
-                temp[6] = new EnhancedNode(n.x+1, n.y, n.z+1);
-                temp[7] = new EnhancedNode(n.x+1, n.y, n.z-1);
-                temp[8] = new EnhancedNode(n.x-1, n.y, n.z+1);
-                temp[9] = new EnhancedNode(n.x-1, n.y, n.z-1);
-                             */
-                
             }
             else
             {
@@ -259,7 +239,7 @@ namespace BradGame3D.AI.Pathing
                     {
                         for (int z = -1; z < 2; z++)
                         {
-                            if (x == 0 && y == 0 && z == 0)
+                            if ((x == 0 && y == 0 && z == 0) || (y==0 && x!=0 && z!= 0))
                             {
                             }
                             else
