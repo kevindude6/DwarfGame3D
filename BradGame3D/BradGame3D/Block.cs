@@ -15,6 +15,7 @@ namespace BradGame3D
         //public Boolean solid = false;
         public bool usedForLighting = false;
         public enum sides { FRONT, BACK, RIGHT, LEFT, TOP, BOTTOM };
+        public static Color blockSelectColor = new Color(1f, 0, 0);
         private bool[] faces = new bool[6];
         public byte lightLevel = 0;
         public byte[] faceLight = new byte[6];
@@ -82,11 +83,17 @@ namespace BradGame3D
 
            
         }
-        public static Color getColorFace(byte a)
+        public static Color getColorFace(int a)
         {
-            if (a > 15) a = 15;
-            //if (a < 15) a = 15;
-            return lightLookup[a];
+            if (a < 0)
+                a = 0;
+            if (a <= 15)
+            {
+                //if (a < 15) a = 15;
+                return lightLookup[(byte) a];
+            }
+            else
+                return blockSelectColor;
         }
         public static bool getRender(byte id) { if (GameScreen.blockDataManager.blocks[id] != null) return GameScreen.blockDataManager.blocks[id].getRender(); else return false; }
         public static bool getSolid(byte id) { if (GameScreen.blockDataManager.blocks[id] != null) return GameScreen.blockDataManager.blocks[id].getSolid(); else return false; }
@@ -347,25 +354,32 @@ namespace BradGame3D
             byte btl=(byte)(ambientOccludeTop(ref w, (int)vertexTypes.BTL,pos)*ambientOccludeMod);
             byte btr=(byte)(ambientOccludeTop(ref w, (int)vertexTypes.BTR,pos)*ambientOccludeMod);
 
+            /*
+            if (ftl > light) ftl = light;
+            if (ftr > light) ftr = light;
+            if (btl > light) btl = light;
+            if (btr > light) btr = light;
+             */
+
             if (ftr + btl >= ftl + btr)
             {
-                vertices.Add(new VertexPositionColorTexture(frontTopLeft + pos, getColorFace((byte)(light - ftl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.TL]));
-                vertices.Add(new VertexPositionColorTexture(frontTopRight + pos, getColorFace((byte)(light - ftr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.TR]));
-                vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((byte)(light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.BR]));
+                vertices.Add(new VertexPositionColorTexture(frontTopLeft + pos, getColorFace((light - ftl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.TL]));
+                vertices.Add(new VertexPositionColorTexture(frontTopRight + pos, getColorFace((light - ftr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.TR]));
+                vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.BR]));
 
-                vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((byte)(light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.BR]));
-                vertices.Add(new VertexPositionColorTexture(backTopLeft + pos, getColorFace((byte)(light - btl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.BL]));
-                vertices.Add(new VertexPositionColorTexture(frontTopLeft + pos, getColorFace((byte)(light - ftl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.TL]));
+                vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.BR]));
+                vertices.Add(new VertexPositionColorTexture(backTopLeft + pos, getColorFace((light - btl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.BL]));
+                vertices.Add(new VertexPositionColorTexture(frontTopLeft + pos, getColorFace((light - ftl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.TL]));
             }
             else
             {
-                vertices.Add(new VertexPositionColorTexture(backTopLeft + pos, getColorFace((byte)(light - btl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.BL]));
-                vertices.Add(new VertexPositionColorTexture(frontTopLeft + pos, getColorFace((byte)(light - ftl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.TL]));
-                vertices.Add(new VertexPositionColorTexture(frontTopRight + pos, getColorFace((byte)(light - ftr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.TR]));
+                vertices.Add(new VertexPositionColorTexture(backTopLeft + pos, getColorFace((light - btl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.BL]));
+                vertices.Add(new VertexPositionColorTexture(frontTopLeft + pos, getColorFace((light - ftl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.TL]));
+                vertices.Add(new VertexPositionColorTexture(frontTopRight + pos, getColorFace((light - ftr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.TR]));
 
-                vertices.Add(new VertexPositionColorTexture(frontTopRight + pos, getColorFace((byte)(light - ftr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.TR]));
-                vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((byte)(light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.BR]));
-                vertices.Add(new VertexPositionColorTexture(backTopLeft + pos, getColorFace((byte)(light - btl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.BL]));
+                vertices.Add(new VertexPositionColorTexture(frontTopRight + pos, getColorFace((light - ftr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.TR]));
+                vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.BR]));
+                vertices.Add(new VertexPositionColorTexture(backTopLeft + pos, getColorFace((light - btl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.TOP][(int)BlockData.CORNER.BL]));
             }
         }
     
@@ -378,13 +392,13 @@ namespace BradGame3D
             byte fbl = (byte)(ambientOccludeFront(ref w, (int)vertexTypes.FBL, pos) * ambientOccludeMod);
             byte fbr = (byte)(ambientOccludeFront(ref w, (int)vertexTypes.FBR, pos) * ambientOccludeMod);
 
-            vertices.Add(new VertexPositionColorTexture(frontTopLeft + pos, getColorFace((byte)(light-ftl)), GameScreen.blockDataManager.blocks[id].texCoords[(int) BlockData.SIDE.FRONT][(int) BlockData.CORNER.TL]));
-            vertices.Add(new VertexPositionColorTexture(frontBottomLeft + pos, getColorFace((byte)(light - fbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.FRONT][(int)BlockData.CORNER.BL]));
-            vertices.Add(new VertexPositionColorTexture(frontTopRight + pos, getColorFace((byte)(light - ftr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.FRONT][(int)BlockData.CORNER.TR]));
+            vertices.Add(new VertexPositionColorTexture(frontTopLeft + pos, getColorFace((light-ftl)), GameScreen.blockDataManager.blocks[id].texCoords[(int) BlockData.SIDE.FRONT][(int) BlockData.CORNER.TL]));
+            vertices.Add(new VertexPositionColorTexture(frontBottomLeft + pos, getColorFace((light - fbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.FRONT][(int)BlockData.CORNER.BL]));
+            vertices.Add(new VertexPositionColorTexture(frontTopRight + pos, getColorFace((light - ftr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.FRONT][(int)BlockData.CORNER.TR]));
 
-            vertices.Add(new VertexPositionColorTexture(frontBottomLeft + pos, getColorFace((byte)(light - fbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.FRONT][(int)BlockData.CORNER.BL]));
-            vertices.Add(new VertexPositionColorTexture(frontBottomRight + pos, getColorFace((byte)(light - fbr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.FRONT][(int)BlockData.CORNER.BR]));
-            vertices.Add(new VertexPositionColorTexture(frontTopRight + pos, getColorFace((byte)(light - ftr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.FRONT][(int)BlockData.CORNER.TR]));
+            vertices.Add(new VertexPositionColorTexture(frontBottomLeft + pos, getColorFace((light - fbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.FRONT][(int)BlockData.CORNER.BL]));
+            vertices.Add(new VertexPositionColorTexture(frontBottomRight + pos, getColorFace((light - fbr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.FRONT][(int)BlockData.CORNER.BR]));
+            vertices.Add(new VertexPositionColorTexture(frontTopRight + pos, getColorFace((light - ftr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.FRONT][(int)BlockData.CORNER.TR]));
         }
 
 
@@ -396,13 +410,13 @@ namespace BradGame3D
             byte bbl = (byte)(ambientOccludeBack(ref w, (int)vertexTypes.BBL, pos) * ambientOccludeMod);
             byte bbr = (byte)(ambientOccludeBack(ref w, (int)vertexTypes.BBR, pos) * ambientOccludeMod);
 
-            vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((byte)(light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.BACK][(int)BlockData.CORNER.TR]));
-            vertices.Add(new VertexPositionColorTexture(backBottomRight + pos, getColorFace((byte)(light - bbr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.BACK][(int)BlockData.CORNER.BR]));
-            vertices.Add(new VertexPositionColorTexture(backBottomLeft + pos, getColorFace((byte)(light - bbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.BACK][(int)BlockData.CORNER.BL]));
+            vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.BACK][(int)BlockData.CORNER.TR]));
+            vertices.Add(new VertexPositionColorTexture(backBottomRight + pos, getColorFace((light - bbr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.BACK][(int)BlockData.CORNER.BR]));
+            vertices.Add(new VertexPositionColorTexture(backBottomLeft + pos, getColorFace((light - bbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.BACK][(int)BlockData.CORNER.BL]));
 
-            vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((byte)(light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.BACK][(int)BlockData.CORNER.TR]));
-            vertices.Add(new VertexPositionColorTexture(backBottomLeft + pos, getColorFace((byte)(light - bbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.BACK][(int)BlockData.CORNER.BL]));
-            vertices.Add(new VertexPositionColorTexture(backTopLeft + pos, getColorFace((byte)(light - btl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.BACK][(int)BlockData.CORNER.TL]));
+            vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.BACK][(int)BlockData.CORNER.TR]));
+            vertices.Add(new VertexPositionColorTexture(backBottomLeft + pos, getColorFace((light - bbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.BACK][(int)BlockData.CORNER.BL]));
+            vertices.Add(new VertexPositionColorTexture(backTopLeft + pos, getColorFace((light - btl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.BACK][(int)BlockData.CORNER.TL]));
         }
 
         public static void addRight(ref World2 w, ref List<VertexPositionColorTexture> vertices, Vector3 pos, byte id, byte light)
@@ -412,13 +426,13 @@ namespace BradGame3D
             byte fbl = (byte)(ambientOccludeRight(ref w, (int)vertexTypes.FBL, pos) * ambientOccludeMod);
             byte bbl = (byte)(ambientOccludeRight(ref w, (int)vertexTypes.BBL, pos) * ambientOccludeMod);
 
-            vertices.Add(new VertexPositionColorTexture(backTopLeft + pos,  getColorFace((byte)(light - btl)), GameScreen.blockDataManager.blocks[id].texCoords[(int) BlockData.SIDE.RIGHT][(int) BlockData.CORNER.TR]));
-            vertices.Add(new VertexPositionColorTexture(backBottomLeft + pos, getColorFace((byte)(light - bbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.RIGHT][(int)BlockData.CORNER.BR]));
-            vertices.Add(new VertexPositionColorTexture(frontBottomLeft + pos, getColorFace((byte)(light - fbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.RIGHT][(int)BlockData.CORNER.BL]));
+            vertices.Add(new VertexPositionColorTexture(backTopLeft + pos,  getColorFace((light - btl)), GameScreen.blockDataManager.blocks[id].texCoords[(int) BlockData.SIDE.RIGHT][(int) BlockData.CORNER.TR]));
+            vertices.Add(new VertexPositionColorTexture(backBottomLeft + pos, getColorFace((light - bbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.RIGHT][(int)BlockData.CORNER.BR]));
+            vertices.Add(new VertexPositionColorTexture(frontBottomLeft + pos, getColorFace((light - fbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.RIGHT][(int)BlockData.CORNER.BL]));
 
-            vertices.Add(new VertexPositionColorTexture(backTopLeft + pos, getColorFace((byte)(light - btl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.RIGHT][(int)BlockData.CORNER.TR]));
-            vertices.Add(new VertexPositionColorTexture(frontBottomLeft + pos, getColorFace((byte)(light - fbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.RIGHT][(int)BlockData.CORNER.BL]));
-            vertices.Add(new VertexPositionColorTexture(frontTopLeft + pos, getColorFace((byte)(light - ftl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.RIGHT][(int)BlockData.CORNER.TL]));
+            vertices.Add(new VertexPositionColorTexture(backTopLeft + pos, getColorFace((light - btl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.RIGHT][(int)BlockData.CORNER.TR]));
+            vertices.Add(new VertexPositionColorTexture(frontBottomLeft + pos, getColorFace((light - fbl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.RIGHT][(int)BlockData.CORNER.BL]));
+            vertices.Add(new VertexPositionColorTexture(frontTopLeft + pos, getColorFace((light - ftl)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.RIGHT][(int)BlockData.CORNER.TL]));
         }
 
         public static void addLeft(ref World2 w, ref List<VertexPositionColorTexture> vertices, Vector3 pos, byte id, byte light)
@@ -428,13 +442,13 @@ namespace BradGame3D
             byte fbr = (byte)(ambientOccludeLeft(ref w, (int)vertexTypes.FBR, pos) * ambientOccludeMod);
             byte bbr = (byte)(ambientOccludeLeft(ref w, (int)vertexTypes.BBR, pos) * ambientOccludeMod);
 
-            vertices.Add(new VertexPositionColorTexture(frontTopRight + pos, getColorFace((byte)(light - ftr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.LEFT][(int)BlockData.CORNER.TR]));
-            vertices.Add(new VertexPositionColorTexture(frontBottomRight + pos, getColorFace((byte)(light - fbr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.LEFT][(int)BlockData.CORNER.BR]));
-            vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((byte)(light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.LEFT][(int)BlockData.CORNER.TL]));
+            vertices.Add(new VertexPositionColorTexture(frontTopRight + pos, getColorFace((light - ftr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.LEFT][(int)BlockData.CORNER.TR]));
+            vertices.Add(new VertexPositionColorTexture(frontBottomRight + pos, getColorFace((light - fbr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.LEFT][(int)BlockData.CORNER.BR]));
+            vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.LEFT][(int)BlockData.CORNER.TL]));
 
-            vertices.Add(new VertexPositionColorTexture(frontBottomRight + pos, getColorFace((byte)(light - fbr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.LEFT][(int)BlockData.CORNER.BR]));
-            vertices.Add(new VertexPositionColorTexture(backBottomRight + pos, getColorFace((byte)(light - bbr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.LEFT][(int)BlockData.CORNER.BL]));
-            vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((byte)(light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.LEFT][(int)BlockData.CORNER.TL]));
+            vertices.Add(new VertexPositionColorTexture(frontBottomRight + pos, getColorFace((light - fbr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.LEFT][(int)BlockData.CORNER.BR]));
+            vertices.Add(new VertexPositionColorTexture(backBottomRight + pos, getColorFace((light - bbr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.LEFT][(int)BlockData.CORNER.BL]));
+            vertices.Add(new VertexPositionColorTexture(backTopRight + pos, getColorFace((light - btr)), GameScreen.blockDataManager.blocks[id].texCoords[(int)BlockData.SIDE.LEFT][(int)BlockData.CORNER.TL]));
         }
 
     }

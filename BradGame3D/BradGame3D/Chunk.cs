@@ -13,7 +13,7 @@ namespace BradGame3D
     {
         public enum DATA { ID, LIGHT };
         public BoundingBox bounds;
-        private GameScreen game;
+        public GameScreen game;
         public World2 world;
         public const int xSize = 16;
         public const int ySize = 128;
@@ -147,7 +147,8 @@ namespace BradGame3D
 
             switch (datatype)
             {
-                case (int) DATA.ID: return sectors[sector].blockIds[remainY * (Chunk.zSize * Chunk.xSize) + remainZ * (Chunk.zSize) + remainX];
+                case (int)DATA.ID: return sectors[sector].blockIds[remainY * (Chunk.zSize * Chunk.xSize) + remainZ * (Chunk.zSize) + remainX]; break;
+                case (int)DATA.LIGHT: return sectors[sector].lightData[remainY * (Chunk.zSize * Chunk.xSize) + remainZ * (Chunk.zSize) + remainX]; break;
             }
             return 0;
 
@@ -169,6 +170,7 @@ namespace BradGame3D
             switch (datatype)
             {
                 case (int)DATA.ID: sectors[sector].blockIds[remainY * (Chunk.zSize * Chunk.xSize) + remainZ * (Chunk.zSize) + remainX] = val; break;
+                case (int)DATA.LIGHT: sectors[sector].lightData[remainY * (Chunk.zSize * Chunk.xSize) + remainZ * (Chunk.zSize) + remainX] = val; break;
             }
             //buildAllSectors();
             return;
@@ -303,7 +305,10 @@ namespace BradGame3D
             //int faces;
             foreach (Plant i in floraList)
             {
-                i.addVertices(ref temp);
+                if (i.bounds.Min.Y < game.sliceLevel)
+                {
+                    i.addVertices(ref temp);
+                }
             }
             floraReady = false;
             floraVertices = temp.ToArray();

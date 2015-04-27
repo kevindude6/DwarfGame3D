@@ -19,6 +19,7 @@ namespace BradGame3D.Entities
         public Vector3 center;
         public float renderWidth = 0.5f;
         public float collideRadius = 0.25f;
+        public bool collideable = false;
         public float height = 0.5f;
         public float collideSquared;
         protected Vector3 netF = new Vector3();
@@ -204,20 +205,23 @@ namespace BradGame3D.Entities
              
             //Other Entities
 
-            foreach (BasicEntity e in parentChunk.ents)
+            if (collideable)
             {
-                if (e != this)
+                foreach (BasicEntity e in parentChunk.ents)
                 {
-                    if (distSquared(this, e) < collideSquared + e.collideSquared)
+                    if (e != this)
                     {
-                        float a = flatDistSquared(this, e);
-                        if (a < collideSquared + e.collideSquared)
+                        if (distSquared(this, e) < collideSquared + e.collideSquared)
                         {
-                            float penetration = collideSquared + e.collideSquared - a;
-                            Vector3 dir = center - e.center;
-                            dir.Normalize();
-                            this.addForce(dir * penetration * mass*50);
-                            e.addForce(dir * -1 * penetration * e.mass*50);
+                            float a = flatDistSquared(this, e);
+                            if (a < collideSquared + e.collideSquared)
+                            {
+                                float penetration = collideSquared + e.collideSquared - a;
+                                Vector3 dir = center - e.center;
+                                dir.Normalize();
+                                this.addForce(dir * penetration * mass * 50);
+                                e.addForce(dir * -1 * penetration * e.mass * 50);
+                            }
                         }
                     }
                 }

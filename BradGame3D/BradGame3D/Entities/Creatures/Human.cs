@@ -13,11 +13,11 @@ namespace BradGame3D.Entities.Creatures
 
         public Human(Vector3 pos, float thealth): base(pos, thealth)
         {
-
+            collideable = true;
         }
-        public Human(Vector3 pos) : base(pos,150)
-        { 
-
+        public Human(Vector3 pos) : this(pos,150)
+        {
+            
         }
         public override void initSize()
         {

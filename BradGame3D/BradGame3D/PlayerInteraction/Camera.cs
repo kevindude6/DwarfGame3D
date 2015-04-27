@@ -137,7 +137,7 @@ namespace BradGame3D.PlayerInteraction
                     }
                 }
 
-                if (Block.getRender(world.getBlockData((int)Chunk.DATA.ID, x, y, z)))
+                if (y < game.sliceLevel && Block.getRender(world.getBlockData((int)Chunk.DATA.ID, x, y, z)))
                 {
                     lookFace = tempLookFace;
                     outVector = new Vector3(x, y, z);

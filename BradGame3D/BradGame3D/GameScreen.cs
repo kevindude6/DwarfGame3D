@@ -19,6 +19,7 @@ namespace BradGame3D
     public class GameScreen
     {
         public Game1 game;
+        public int sliceLevel = 65;
         public static World2 w;
 
         float camSpeedMod = 20;
@@ -56,6 +57,10 @@ namespace BradGame3D
         public AI.Pathing.Node start = null;
         public AI.Pathing.Node end = null;
         public MouseIndicator mMouseIndicator;
+
+        private Vector3 mouseSelectStart;
+        private Vector3 mouseSelectEnd;
+        private List<MouseIndicator> selectionList = new List<MouseIndicator>();
         Random r;
         public bool loadedChunkThisFrame = false;
 
@@ -158,12 +163,14 @@ namespace BradGame3D
         }
         public void updateGame(GameTime gameTime)
         {
-
-            loadedChunkThisFrame = false;
-            doInputGame(gameTime);
-            mCam.doCameraGame();
-            updateFrustum();
-            updateEnts(gameTime);
+            if (game.IsActive)
+            {
+                loadedChunkThisFrame = false;
+                doInputGame(gameTime);
+                mCam.doCameraGame();
+                updateFrustum();
+                updateEnts(gameTime);
+            }
           
         }
         private void updateEnts(GameTime g)
@@ -208,9 +215,9 @@ namespace BradGame3D
             mCam.doCameraInput(gameTime, k);
              
             bool pauseplaceholder = false;
+
             if (k.IsKeyDown(Keys.R))
                 pauseplaceholder = true;
-
             if (pauseplaceholder)
                 pauseplaceholder = false;
 
@@ -222,6 +229,18 @@ namespace BradGame3D
             if (k.IsKeyDown(Keys.D5)) currentBlock = 5;
             if (k.IsKeyDown(Keys.D6)) currentBlock = 6;
 
+            if (k.IsKeyDown(Keys.PageUp))
+            {
+                //w.updateSlice(sliceLevel + 1);
+                Thread thread = new Thread(() => w.updateSlice(sliceLevel + 1));
+                thread.Start();
+            }
+            if (k.IsKeyDown(Keys.PageDown))
+            {
+                //w.updateSlice(sliceLevel - 1);
+                Thread thread = new Thread(() => w.updateSlice(sliceLevel-1));
+                thread.Start();
+            }
             if (k.IsKeyDown(Keys.C))
             {
                 Vector3 a = blockCastTarget;
@@ -254,12 +273,13 @@ namespace BradGame3D
                 }
                 
          
-                if (currentMouseState.LeftButton == ButtonState.Pressed)
+                if (currentMouseState.LeftButton == ButtonState.Pressed && mouseReady)
                 {
                     Vector3 a = blockCastTarget;
                     if (!Vector3.Equals(a, new Vector3(-1, -1, -1)))
                     {
-                        //w.makeTree(a + lookFace);
+                        
+                        
                         SpriteSheetEnhanced tsheet;
                         sheetManager.dict.TryGetValue(Entities.Creatures.Human.SheetName, out tsheet);
                         test = new Entities.Creatures.Human(a + lookFace + new Vector3((float) (r.NextDouble() - 0.5f), 2, (float) (r.NextDouble()-0.5f)), 100);
@@ -267,20 +287,17 @@ namespace BradGame3D
                         //test.velocity.X = (float) (r.NextDouble() * 10 - 5);
                         //test.velocity.Y = (float)(r.NextDouble() * 10 + 2);
                         //test.velocity.Z = (float)(r.NextDouble() * 10 - 5);
-                        /*
-                        test.renderWidth = RandomFunctions.Normal(r, 0.15f, 0.5f);
-                        test.collideRadius = test.renderWidth / 2;
-                        test.collideSquared = test.collideRadius * test.collideRadius;
-                        test.height = RandomFunctions.Normal(r, 0.05f, 0.5f);
-                         * */
+         
                         tsheet.addEnt(test);
-                        Vector3 temp = a+lookFace;
-                        //start = new AI.Pathing.Node((int)temp.X, (int)temp.Y,(int) temp.Z);
-                        mouseReady = false;
-                        DEBUGnuments++;
-
                         
-                        //w.setBlockData((byte)currentBlock,(int) Chunk.DATA.ID, temp);
+                        //mouseReady = false;
+                        DEBUGnuments++;
+                        
+                        
+                        //w.setBlockData(100,(int) Chunk.DATA.LIGHT, a);
+                        //mouseSelectStart = a;
+                        //mouseReady = false;
+                        
 
                     }
                 }
@@ -299,6 +316,7 @@ namespace BradGame3D
                         //w.setBlockData((byte)0, (int)Chunk.DATA.ID, a);
                         
                         //test.followPath(AI.Pathing.Pathing.findPath(test.center,temp,w));
+                        
                         SpriteSheetEnhanced tsheet;
                         sheetManager.dict.TryGetValue(Entities.Creatures.Human.SheetName, out tsheet);
                         AI.Pathing.PathingManager.data.Clear();
@@ -311,6 +329,29 @@ namespace BradGame3D
                             AI.Pathing.PathingManager.data.Add(p);
                         }
                        
+                        /*
+                        mouseSelectEnd = a;
+                        int xSign = Math.Sign(mouseSelectEnd.X - mouseSelectStart.X); if (xSign == 0) xSign = 1;
+                        int ySign = Math.Sign(mouseSelectEnd.Y - mouseSelectStart.Y); if (ySign == 0) ySign = 1;
+                        int zSign = Math.Sign(mouseSelectEnd.Z - mouseSelectStart.Z); if (zSign == 0) zSign = 1;
+                        for (int x = (int)Math.Round(mouseSelectStart.X); x != (int)Math.Round(mouseSelectEnd.X)+xSign; x+= 1*xSign)
+                        {
+                            for (int z= (int)Math.Round(mouseSelectStart.Z); z != (int)Math.Round(mouseSelectEnd.Z)+zSign; z+= 1*zSign)
+                            {
+                                for (int y = (int)Math.Round(mouseSelectStart.Y); y != (int)Math.Round(mouseSelectEnd.Y)+ySign; y+= 1*ySign)
+                                {
+                                    if(w.isRender(x,y,z))
+                                    {
+                                        MouseIndicator tempInd = new MouseIndicator(game);
+                                        tempInd.setPosition(new Vector3(x, y, z));
+                                        selectionList.Add(tempInd);
+                                        //w.setBlockData(0, (int) Chunk.DATA.ID, new Vector3(x,y,z));
+                                    }
+                                }
+                            }
+                        }
+                         */
+                      
                         mouseReady = false;
                         /*
                         if (start != null && end != null)
@@ -411,6 +452,10 @@ namespace BradGame3D
                 effect.Texture = mMouseIndicator.myTex;
                 pass.Apply();
                 mMouseIndicator.Draw(graphics);
+                foreach (MouseIndicator m in selectionList)
+                {
+                    m.Draw(graphics);
+                }
             }
 
             //bounding boxes stuff

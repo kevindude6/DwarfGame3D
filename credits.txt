@@ -1,0 +1,19 @@
+Credit where credit is due:
+-Character Sprite - Sithjester
+-Shrub Sprite - /u/KenNL
+-All block textures and art - /u/frothingnome
+
+
+**Bradgame: The Game**
+This is the first time I've posted here. Eventually, I'd like this to be an open world voxel based RPG, but for now I'm starting with a dwarf fortress clone. This past week I've added collision detection for entities and threaded pathfinding so the game doesn't freeze whenever things move.
+
+[Yay pictures!](http://imgur.com/a/47SWi)
+
+Not really a huge amount of playable-ness, but it's getting there. I spent a long time optimizing the engine, and it still needs a lot of work. 
+
+Bonus: I like the idea of making old games playable on modern hardware, but I haven't bought any remasters of any game yet.
+
+Credit where credit is due:
+-Character Sprite - Sithjester
+-Shrub Sprite - /u/KenNL
+-All block textures and art - /u/frothingnome

@@ -24,14 +24,15 @@ namespace BradGame3D.Entities
         public bool followingPath = false;
         public enum ANIMSTATES {IDLE,WALK};
         new public static string SheetName = "Squirrel";
+        //public bool collideable = true;
         
-        public LivingEntity(Vector3 pos, float tHealth) : base(pos)
+        public LivingEntity(Vector3 pos, float tHealth) : this(pos) 
         {
             health = tHealth;
         }
         public LivingEntity(Vector3 pos): base(pos)
         {
-
+            collideable = true;
         }
 
         public void followPath(Path p)

@@ -51,7 +51,7 @@ namespace BradGame3D
                 {
                     if (z >= 0 &&z < worldSize &&x >= 0 &&  x < worldSize)
                     {
-                        chunks[z ][x] = loadChunk(game, this, x, z);
+                        chunks[z][x] = loadChunk(game, this, x, z);
                     }
                 }
             }
@@ -68,6 +68,7 @@ namespace BradGame3D
                 }
             }
             initialized = true;
+            
         }
         public Chunk loadChunk(GameScreen game, World2 w, int x, int z)
         {
@@ -114,16 +115,18 @@ namespace BradGame3D
             while (1 == 1)
             {
 
-                if (game.loadedChunkThisFrame == false && initialized)
+                
+                if (initialized)
                 {
                     if (brokedSectors.Count > 0)
                     {
                         BlockSector sec = getClosest();
-                        if (sec != null && sec.isReady == false)
+                        if (sec != null)
                         {
                             sec.buildList();
+                            brokedSectors.Remove(sec);
                         }
-                        brokedSectors.Remove(sec);
+                        
                         //Thread.Sleep(20);
                     }
                     //game.loadedChunkThisFrame = true;
@@ -134,22 +137,29 @@ namespace BradGame3D
         }
         private BlockSector getClosest()
         {
+            
             BlockSector sec = null;
-            float minDist = 999999;
-            int id = 0;
-            for(int i = 0; i < brokedSectors.Count; i++)
+            if (brokedSectors.Count > 0)
             {
-                if (brokedSectors[i] != null)
+                float minDist = 99999999;
+                float dist;
+                int id = 0;
+                for (int i = 0; i < brokedSectors.Count; i++)
                 {
-                    float dist = (float)(Math.Pow((brokedSectors[i].c.chunkX*Chunk.xSize - game.mCam.camPos.X), 2) + Math.Pow((brokedSectors[i].c.chunkZ*Chunk.zSize - game.mCam.camPos.Z), 2) + Math.Pow((brokedSectors[i].yBase - game.mCam.camPos.Y), 2));
-                    if (dist < minDist)
+                    if (brokedSectors[i] != null)
                     {
-                        minDist = dist;
-                        id = i;
+                        dist = (float)(Math.Pow((brokedSectors[i].c.chunkX*Chunk.xSize - game.mCam.camPos.X), 2) + Math.Pow((brokedSectors[i].c.chunkZ*Chunk.zSize - game.mCam.camPos.Z), 2) + Math.Pow((brokedSectors[i].yBase - game.mCam.camPos.Y), 2));
+                        //dist = Math.Abs(brokedSectors[i].c.chunkX - (int)(game.mCam.camPos.X / Chunk.xSize)) + Math.Abs(brokedSectors[i].c.chunkZ - (int)(game.mCam.camPos.Z / Chunk.zSize)) + Math.Abs((int)(game.mCam.camPos.Y / BlockSector.ySize) - brokedSectors[i].yBase / BlockSector.ySize);
+                        if (dist < minDist)
+                        {
+                            minDist = dist;
+                            id = i;
+                        }
                     }
                 }
+
+                sec = brokedSectors[id];
             }
-            sec = brokedSectors[id];
             return sec;
         }
         
@@ -362,6 +372,10 @@ namespace BradGame3D
         {
             return GameScreen.blockDataManager.blocks[getBlockData((int) Chunk.DATA.ID, x, y, z)].getSolid();
         }
+        public bool isRender(int x, int y, int z)
+        {
+            return GameScreen.blockDataManager.blocks[getBlockData((int)Chunk.DATA.ID, x, y, z)].getRender();
+        }
 
         public void makeTree(Vector3 a)
         {
@@ -374,6 +388,48 @@ namespace BradGame3D
         public Chunk getChunk(Vector3 a)
         {
             return chunks[(int)a.Z / Chunk.zSize][(int)(a.X / Chunk.xSize)];
+        }
+        public void updateSlice(int a)
+        {
+            int oldSlice = game.sliceLevel;
+            game.sliceLevel = a;
+            int sectorLevel = a / BlockSector.ySize;
+            int oldSectorLevel = oldSlice / BlockSector.ySize;
+            for (int z = 0; z <= worldSize; z++)
+            {
+                for (int x = 0; x <= worldSize; x++)
+                {
+                    if (z >= 0 && z < worldSize && x >= 0 && x < worldSize)
+                    {
+                        if (chunks[z][x] != null)
+                        {
+                            /*
+                            for (int sector = Chunk.sectorCount; sector * BlockSector.ySize > game.sliceLevel; sector--)
+                            {
+                                
+                                if (!brokedSectors.Contains(chunks[z][x].sectors[sector-1]))
+                                    brokedSectors.Add(chunks[z][x].sectors[sector-1]);
+                                chunks[z][x].sectors[sector-1].isReady = false;
+                                
+                            }*/
+                            if (!brokedSectors.Contains(chunks[z][x].sectors[sectorLevel]))
+                                brokedSectors.Add(chunks[z][x].sectors[sectorLevel]);
+                            chunks[z][x].sectors[sectorLevel].isReady = false;
+
+                            if (oldSectorLevel != sectorLevel)
+                            {
+                                if (!brokedSectors.Contains(chunks[z][x].sectors[oldSectorLevel]))
+                                    brokedSectors.Add(chunks[z][x].sectors[oldSectorLevel]);
+                                chunks[z][x].sectors[oldSectorLevel].isReady = false;
+                            }
+
+                            
+                            chunks[z][x].buildFloraList();
+                        }
+                        //Thread.Sleep(1);
+                    }
+                }
+            }
         }
     }
 }
