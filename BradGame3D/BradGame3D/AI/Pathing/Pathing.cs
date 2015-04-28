@@ -28,7 +28,7 @@ namespace BradGame3D.AI.Pathing
     public class Pathing
     {
       //  public static EnhancedNode[] temp = new EnhancedNode[26];
-        public static EnhancedNode[] temp = new EnhancedNode[22];
+        public static EnhancedNode[] temp = new EnhancedNode[6];
         public static Path findPath(Vector3 start, Vector3 end, World2 w)
         {
             return findPath(new Node((int)Math.Round(start.X), (int)Math.Round(start.Y), (int)Math.Round(start.Z)), new Node((int)Math.Round(end.X), (int)Math.Round(end.Y), (int)Math.Round(end.Z)), w);
@@ -97,7 +97,7 @@ namespace BradGame3D.AI.Pathing
                     {
                         EnhancedNode n = new EnhancedNode(t.x, t.y, t.z);
 
-                        if (!GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y, n.z)].getSolid() && w.isSolid(n.x, n.y - 1, n.z))
+                        if (!GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y, n.z)].getSolid() && (w.isSolid(n.x, n.y - 1, n.z) || w.isSolid(n.x,n.y-2,n.z)))
                         {
                             float newCost = current.cost + getHeuristic(current, n.toNode());
 
@@ -161,6 +161,13 @@ namespace BradGame3D.AI.Pathing
             //EnhancedNode[] temp = new EnhancedNode[6];
             if (temp[0] == null)
             {
+                temp[0]= new EnhancedNode(n.x + 1, n.y, n.z);
+                temp[1]= new EnhancedNode(n.x - 1, n.y, n.z);
+                temp[2]= new EnhancedNode(n.x, n.y + 1, n.z);
+                temp[3]= new EnhancedNode(n.x, n.y - 1, n.z);
+                temp[4]= new EnhancedNode(n.x, n.y, n.z + 1);
+                temp[5]= new EnhancedNode(n.x, n.y, n.z - 1);
+                /*
                 int count = 0;
                 for (int x = -1; x < 2; x++)
                 {
@@ -168,7 +175,7 @@ namespace BradGame3D.AI.Pathing
                     {
                         for (int z = -1; z < 2; z++)
                         {
-                            if ((x == 0 && y == 0 && z == 0) || (y==0 && x!=0 && z!= 0))
+                            if ((x == 0 && y == 0 && z == 0) || (x!=0 && z!= 0))
                             {
                             }
                             else
@@ -179,9 +186,12 @@ namespace BradGame3D.AI.Pathing
                         }
                     }
                 }
+                 */
+                 
             }
             else
             {
+                /*
                 int count = 0;
                 for (int x = -1; x < 2; x++)
                 {
@@ -189,7 +199,7 @@ namespace BradGame3D.AI.Pathing
                     {
                         for (int z = -1; z < 2; z++)
                         {
-                            if ((x == 0 && y == 0 && z == 0) || (y==0 && x!=0 && z!= 0))
+                            if ((x == 0 && y == 0 && z == 0) || (x!=0 && z!= 0))
                             {
                             }
                             else
@@ -200,14 +210,15 @@ namespace BradGame3D.AI.Pathing
                         }
                     }
                 }
-                /*
+                */
+                
                 temp[0].setXYZ(n.x + 1, n.y, n.z);
                 temp[1].setXYZ(n.x - 1, n.y, n.z);
                 temp[2].setXYZ(n.x, n.y + 1, n.z);
                 temp[3].setXYZ(n.x, n.y - 1, n.z);
                 temp[4].setXYZ(n.x, n.y, n.z + 1);
                 temp[5].setXYZ(n.x, n.y, n.z - 1);
-
+                /*
                 temp[6].setXYZ(n.x + 1, n.y, n.z + 1);
                 temp[7].setXYZ(n.x + 1, n.y, n.z - 1);
                 temp[8].setXYZ(n.x - 1, n.y, n.z + 1);
