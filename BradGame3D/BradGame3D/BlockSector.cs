@@ -85,22 +85,21 @@ namespace BradGame3D
                             Block.addRight(ref c.world, ref vertices, temp, blockIds[i], lightData[i]);
                             newfaceCount++;
                         }
-
-                        if (y == c.game.sliceLevel - 1)
+                        a = c.world.getBlockData((int)Chunk.DATA.ID, x, y + 1, z);
+                        if (!Block.getRender(a))
                         {
-                            Block.addTop(ref c.world, ref vertices, temp, blockIds[i], 3);
+                            Block.addTop(ref c.world, ref vertices, temp, blockIds[i], lightData[i]);
                             newfaceCount++;
                         }
                         else
                         {
-                            a = c.world.getBlockData((int)Chunk.DATA.ID, x, y + 1, z);
-                            if (!Block.getRender(a))
+                            if (y == c.game.sliceLevel - 1)
                             {
-                                Block.addTop(ref c.world, ref vertices, temp, blockIds[i], lightData[i]);
+                                Block.addTop(ref c.world, ref vertices, temp, blockIds[i], 7);
                                 newfaceCount++;
                             }
                         }
-
+                        
                         a = c.world.getBlockData((int)Chunk.DATA.ID, x, y - 1, z);
                         if (!Block.getRender(a))
                         {

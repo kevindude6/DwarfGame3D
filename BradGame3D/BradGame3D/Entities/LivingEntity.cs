@@ -17,7 +17,7 @@ namespace BradGame3D.Entities
         public float runSpeed=5f;
         public float walkSpeed=2f;
         public float jumpForce = 600;
-        public float pathTolerance = 1f;
+        public float pathTolerance = 0.8f;
         public float currentSpeed = 0;
         static string[] anims = new string[] { "Idle", "Walk" };
         public Path currentPath = null;

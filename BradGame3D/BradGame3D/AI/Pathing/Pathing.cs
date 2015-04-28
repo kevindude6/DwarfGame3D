@@ -70,14 +70,34 @@ namespace BradGame3D.AI.Pathing
                     finding = false;
                     tempEnd = current;
                 }
+                else if (count > 15000) //EARLY EXIT
+                {
+                    //Debug.WriteLine("Early exit");
+                    finding = false;
+                    tempEnd = current;
+                    //find closest
+                    float min = 99999999;
+
+                    foreach (EnhancedNode n in openList.Values)
+                    {
+                        if (getHeuristic(n, end) < min)
+                        {
+                            min = getHeuristic(n, end);
+                            tempEnd = n;
+                        }
+                    }
+                    Node tnode = new Node(tempEnd.x, tempEnd.y, tempEnd.z);
+                    return findPath(start, tnode, w);
+                        //Debug.WriteLine(n);
+                }
                 else
                 {
                     getNeighbors(current);
                     foreach (EnhancedNode t in temp)
                     {
-                        EnhancedNode n = new EnhancedNode(t.x,t.y,t.z);
-                       
-                        if (!GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y, n.z)].getSolid() && w.isSolid(n.x,n.y-1,n.z))
+                        EnhancedNode n = new EnhancedNode(t.x, t.y, t.z);
+
+                        if (!GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y, n.z)].getSolid() && w.isSolid(n.x, n.y - 1, n.z))
                         {
                             float newCost = current.cost + getHeuristic(current, n.toNode());
 
@@ -97,83 +117,13 @@ namespace BradGame3D.AI.Pathing
                                 //Debug.WriteLine("Replacing node " + n.toNode().ToString() + " with cost " + n.cost + " and priority " + (newCost + getHeuristic(n, end)));
                                 openList.Add(newCost + getHeuristic(n, end), n);
                             }
+                            count++;
                         }
                     }
                     openList.RemoveAt(openList.IndexOfValue(current));
                 }
             }
-            /*
-            while (finding)
-            {
-                EnhancedNode cur = openList.First().Value;
-                if (cur.Equals(end))
-                {
-                    finding = false;
-                    tempEnd = cur;
-                    Debug.WriteLine("Winrar");
-                    break;
-                }
-                getNeighbors(cur);
-                foreach (EnhancedNode a in temp)
-                {
-                    EnhancedNode n = new EnhancedNode(a.x, a.y, a.z);
-                    bool inClosedList = closedList.Contains(n);
-                    if (!inClosedList)
-                    {
-                        if (GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y, n.z)].getSolid())
-                        {
-                            closedList.Add(n);
-                            //openList.RemoveAt(0);
-                            Debug.WriteLine("Added block to closed list due to being solid: " + n.toNode().ToString());
-                            continue;
-                        }
-
-                        //if (!GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y - 1, n.z)].getSolid() && !GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y - 2, n.z)].getSolid())
-                        if(!GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y - 1, n.z)].getSolid())
-                        {
-                            closedList.Add(n);
-                            //openList.RemoveAt(0);
-                            Debug.WriteLine("Added block to closed list due to air underneath: "+ n.toNode().ToString());
-                            
-                            continue;
-                        }
-                    }
-                    float newcost = 9000;
-                    if (n.y > cur.y)
-                        newcost = cur.cost + getHeuristic(n, end) + 3;
-                    else if (n.y < cur.y)
-                        newcost = cur.cost + getHeuristic(n, end);
-                    else
-                        newcost = cur.cost + getHeuristic(n, end) + 1;
-
-                    int i = closedList.IndexOf(n);
-                    if (!inClosedList || closedList.ElementAt(i).cost >newcost)
-                    {
-                        if (i >= 0 && i < closedList.Count)
-                            closedList.RemoveAt(i);
-                        n.parent = cur;
-                        n.cost = newcost;
-                        Debug.WriteLine("Adding Node To Open List" + n.toNode().ToString() + " with cost " + n.cost);
-                        openList.Add(n.cost, n);
-                        closedList.Add(n);
-                    }
-                    count++;
-                    if (count == 27)
-                    {
-
-                    }
-                    
-
-                }
-                closedList.Add(cur);
-                openList.RemoveAt(0);
-                
-                //Debug.Write("\n\n");
-               // Debug.WriteLine(openList.Keys.ToString());
-                //openList.
-
-            }
-             */
+          
             Path p = new Path();
             p.nodeList.Add(tempEnd.toNode());
            // EnhancedNode t = tempEnd.parent;
@@ -183,7 +133,7 @@ namespace BradGame3D.AI.Pathing
                 p.nodeList.Add(tempEnd.toNode());
             }
             p.nodeList.Reverse();
-            //Debug.WriteLine(p.ToString());
+            //Debug.WriteLine("count: " + count);
             return p;
             
         }

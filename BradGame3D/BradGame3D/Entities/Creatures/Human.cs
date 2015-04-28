@@ -9,7 +9,9 @@ namespace BradGame3D.Entities.Creatures
     public class Human : LivingEntity
     {
         new public static string SheetName = "Human";
-       
+        public enum JOBS {Mining, Chopping};
+        public byte[] jobProficiency = new byte[2];
+        public float[] jobEXP = new float[2];
 
         public Human(Vector3 pos, float thealth): base(pos, thealth)
         {

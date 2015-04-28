@@ -229,13 +229,14 @@ namespace BradGame3D
             if (k.IsKeyDown(Keys.D5)) currentBlock = 5;
             if (k.IsKeyDown(Keys.D6)) currentBlock = 6;
 
-            if (k.IsKeyDown(Keys.PageUp))
+            if (k.IsKeyDown(Keys.PageUp) && oldKeyState.IsKeyUp(Keys.PageUp))
             {
                 //w.updateSlice(sliceLevel + 1);
                 Thread thread = new Thread(() => w.updateSlice(sliceLevel + 1));
                 thread.Start();
+                
             }
-            if (k.IsKeyDown(Keys.PageDown))
+            if (k.IsKeyDown(Keys.PageDown) && oldKeyState.IsKeyUp(Keys.PageDown))
             {
                 //w.updateSlice(sliceLevel - 1);
                 Thread thread = new Thread(() => w.updateSlice(sliceLevel-1));
