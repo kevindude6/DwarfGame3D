@@ -320,14 +320,17 @@ namespace BradGame3D
                         
                         SpriteSheetEnhanced tsheet;
                         sheetManager.dict.TryGetValue(Entities.Creatures.Human.SheetName, out tsheet);
-                        AI.Pathing.PathingManager.data.Clear();
+                        //AI.Pathing.PathingManager.data.Clear();
                         foreach (LivingEntity e in tsheet.ents)
                         {
+                            e.finalTarget = temp;
+                            /*
                             AI.Pathing.PathData p;
                             p.start = e.center;
                             p.end = temp;
                             p.b = e;
                             AI.Pathing.PathingManager.data.Add(p);
+                             */
                         }
                        
                         /*

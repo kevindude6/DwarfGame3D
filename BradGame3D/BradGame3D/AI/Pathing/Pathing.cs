@@ -42,7 +42,7 @@ namespace BradGame3D.AI.Pathing
             {
                 return null;
             }
-            if (w.isSolid(end.x, end.y - 2, end.z) == false)
+            if (w.isSolid(end.x, end.y - 2, end.z) == false && w.isSolid(end.x,end.y-1,end.z)==false)
             {
                 return null;
             }

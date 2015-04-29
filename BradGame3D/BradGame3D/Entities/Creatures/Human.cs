@@ -10,8 +10,10 @@ namespace BradGame3D.Entities.Creatures
     {
         new public static string SheetName = "Human";
         public enum JOBS {Mining, Chopping};
-        public byte[] jobProficiency = new byte[2];
-        public float[] jobEXP = new float[2];
+        private static int jobsNum = 2;
+        public byte[] jobProficiency = new byte[jobsNum];
+        public bool[] jobEnabled = new bool[jobsNum];
+        public float[] jobEXP = new float[jobsNum];
 
         public Human(Vector3 pos, float thealth): base(pos, thealth)
         {
@@ -19,7 +21,7 @@ namespace BradGame3D.Entities.Creatures
         }
         public Human(Vector3 pos) : this(pos,150)
         {
-            
+            jobProficiency[(int)JOBS.Mining] = 255;
         }
         public override void initSize()
         {

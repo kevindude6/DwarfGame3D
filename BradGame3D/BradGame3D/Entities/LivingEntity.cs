@@ -14,11 +14,13 @@ namespace BradGame3D.Entities
         public float health = 100;
       
         public Vector2 lookDir = new Vector2(1,0);
+        public Vector3 finalTarget;
         public float runSpeed=5f;
         public float walkSpeed=2f;
         public float jumpForce = 600;
-        public float pathTolerance = 0.8f;
+        public float pathTolerance = 0.95f;
         public float currentSpeed = 0;
+        private bool waitingForPath = false;
         static string[] anims = new string[] { "Idle", "Walk" };
         public Path currentPath = null;
         public bool followingPath = false;
@@ -33,6 +35,9 @@ namespace BradGame3D.Entities
         public LivingEntity(Vector3 pos): base(pos)
         {
             collideable = true;
+            finalTarget.X = -1;
+            finalTarget.Y = -1;
+            finalTarget.Z = -1;
         }
 
         public void followPath(Path p)
@@ -42,100 +47,125 @@ namespace BradGame3D.Entities
                 currentPath = p;
                 followingPath = true;
             }
+            else
+            {
+                finalTarget.X = -1;
+                finalTarget.Y = -1;
+                finalTarget.Z = -1;
+            }
         }
         public static float findAng(Vector2 a, Vector2 b)
         {
             //Debug.WriteLine(Vector2.Dot(a, b) / (a.Length() * b.Length()));
             return (float)Math.Acos(Vector2.Dot(a, b) / (a.Length() * b.Length())) * 57.2957795f;
         }
+        public float distTo(Vector3 a)
+        {
+            double xdist = Math.Pow((float)center.X - a.X, 2);
+            double ydist = Math.Pow((float)center.Y - a.Y, 2);
+            double zdist = Math.Pow((float)center.Z - a.Z, 2);
+            return (float)Math.Sqrt(xdist + ydist + zdist);
+        }
         public override void update(float gameTime, World2 w)
         {
             base.update(gameTime,w);
 
             currentLook = SpriteSheet.Direction.TOWARD;
-            /*
-            Vector3 footPos = center + new Vector3(0,-height/2,0);
-            bool solidFeet = GameScreen.blockDataManager.blocks[w.getBlockData((int) Chunk.DATA.ID,(int) Math.Round(footPos.X),(int) Math.Round(footPos.Y),(int) Math.Round(footPos.Z))].getSolid();
-            if (solidFeet)
+            if (followingPath)
             {
-                isOnGround = true;
-                velocity.Y = 0;
-                center.Y = (int)Math.Round(footPos.Y) + 0.499f + height / 2;
-            }
-            else
-            {
-                velocity.Y -= 0.03f;
-            }
-             */
+                waitingForPath = false;
+                currentAnim = anims[(int)ANIMSTATES.WALK];
 
-
-            
-                if (followingPath)
+                if (currentPath.nodeList.ElementAt(0).distTo(center) < pathTolerance)
                 {
-                    currentAnim = anims[(int)ANIMSTATES.WALK];
+                    currentPath.nodeList.RemoveAt(0);
+                }
+                if (currentPath.nodeList.Count() == 0)
+                {
+                    followingPath = false;
+                    currentPath = null;
 
-                    if (currentPath.nodeList.ElementAt(0).distTo(center) < pathTolerance)
+                    if (distTo(finalTarget) < pathTolerance)
                     {
-                        currentPath.nodeList.RemoveAt(0);
+                        finalTarget.X = -1;
+                        finalTarget.Y = -1;
+                        finalTarget.Z = -1;
                     }
-                    if (currentPath.nodeList.Count() == 0)
-                    {
-                        followingPath = false;
-                        currentPath = null;
-                        velocity = Vector3.Zero;
-                    }
-                    else
-                    {
-                        Node n = currentPath.nodeList.ElementAt(0);
-                        //int x = (int)Math.Round(center.X);
-                        int y = (int)Math.Round(center.Y);
-                        //int z = (int)Math.Round(center.Z);
-                        Vector3 dir = new Vector3(n.x - center.X, n.y - center.Y, n.z - center.Z);
-
-                        dir.Normalize();
-                        dir = dir * runSpeed;
-                       
-                        Vector3 steeringForce = dir - velocity;
-                        //steeringForce /= mass;
-                        //velocity = steeringForce + velocity;
-                        if (isOnGround)
-                        {
-                            addForce(steeringForce * mass * 10);
-                            if (velocity.Length() > runSpeed)
-                            {
-                                velocity.Normalize();
-                                velocity = velocity * runSpeed;
-                            }
-                            if (n.y>y)
-                            {
-                                //addForce(new Vector3(0, 1000, 0));
-                                velocity.Y += 5.2f;
-                                isOnGround = false;
-                            }
-                        }
-                        else
-                        {
-                            steeringForce.Y = 0;
-                            addForce(steeringForce * mass * 5);
-                        }
-
-                       
-                    }
+                    
+                    //velocity = Vector3.Zero;
                 }
                 else
                 {
+                    Node n = currentPath.nodeList.ElementAt(0);
+                    //int x = (int)Math.Round(center.X);
+                    int y = (int)Math.Round(center.Y);
+                    //int z = (int)Math.Round(center.Z);
+                    Vector3 dir = new Vector3(n.x - center.X, n.y - center.Y, n.z - center.Z);
+
+                    dir.Normalize();
+                    dir = dir * runSpeed;
+                       
+                    Vector3 steeringForce = dir - velocity;
+                    //steeringForce /= mass;
+                    //velocity = steeringForce + velocity;
                     if (isOnGround)
                     {
-                        currentAnim = anims[(int)ANIMSTATES.IDLE];
-                        addForce(velocity * -mass * 7);
+                        addForce(steeringForce * mass * 10);
+                        if (velocity.Length() > runSpeed)
+                        {
+                            velocity.Normalize();
+                            velocity = velocity * runSpeed;
+                        }
+                        if (n.y>y)
+                        {
+                            //addForce(new Vector3(0, 1000, 0));
+                            velocity.Y += 5.2f;
+                            isOnGround = false;
+                        }
+                    }
+                    else
+                    {
+                        steeringForce.Y = 0;
+                        addForce(steeringForce * mass * 5);
                     }
 
+                       
+                }
+            }
+            else
+            {
+                if (waitingForPath == false)
+                {
+                    if (finalTarget.X != -1 && finalTarget.Y != -1 && finalTarget.Z != -1)
+                    {
+                        int x = (int)Math.Round(center.X);
+                        int y = (int)Math.Round(center.Y);
+                        int z = (int)Math.Round(center.Z);
+                        if ((int)finalTarget.X != x || (int)finalTarget.Y != y || (int)finalTarget.Z != z)
+                        {
+                            PathData a;
+                            a.start = center;
+                            a.end = finalTarget;
+                            a.b = this;
+                            PathingManager.data.Add(a);
+                            waitingForPath = true;
+                        }
+                    }
+                    
                 }
 
-                if (!isOnGround)
+                if (isOnGround)
                 {
-                    addForce(new Vector3(0, -10 * mass, 0));
+                    currentAnim = anims[(int)ANIMSTATES.IDLE];
+                    addForce(velocity * -mass * 7);
                 }
+
+            }
+
+            if (!isOnGround)
+            {
+                addForce(new Vector3(0, -10 * mass, 0));
+            }
 
                
 
