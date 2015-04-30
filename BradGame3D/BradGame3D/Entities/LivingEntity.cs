@@ -35,9 +35,7 @@ namespace BradGame3D.Entities
         public LivingEntity(Vector3 pos): base(pos)
         {
             collideable = true;
-            finalTarget.X = -1;
-            finalTarget.Y = -1;
-            finalTarget.Z = -1;
+            setFinalTarget(-1, -1, -1);
         }
 
         public void followPath(Path p)
@@ -49,9 +47,7 @@ namespace BradGame3D.Entities
             }
             else
             {
-                finalTarget.X = -1;
-                finalTarget.Y = -1;
-                finalTarget.Z = -1;
+                setFinalTarget(-1, -1, -1);
             }
         }
         public static float findAng(Vector2 a, Vector2 b)
@@ -65,6 +61,17 @@ namespace BradGame3D.Entities
             double ydist = Math.Pow((float)center.Y - a.Y, 2);
             double zdist = Math.Pow((float)center.Z - a.Z, 2);
             return (float)Math.Sqrt(xdist + ydist + zdist);
+        }
+        public void setFinalTarget(int x, int y, int z)
+        {
+            finalTarget.X = x;
+            finalTarget.Y = y;
+            finalTarget.Z = z;
+        }
+        public virtual void doOnArrive()
+        {
+
+
         }
         public override void update(float gameTime, World2 w)
         {
@@ -87,9 +94,8 @@ namespace BradGame3D.Entities
 
                     if (distTo(finalTarget) < pathTolerance)
                     {
-                        finalTarget.X = -1;
-                        finalTarget.Y = -1;
-                        finalTarget.Z = -1;
+                        setFinalTarget(-1, -1, -1);
+                        doOnArrive();
                     }
                     
                     //velocity = Vector3.Zero;

@@ -70,7 +70,7 @@ namespace BradGame3D.AI.Pathing
                     finding = false;
                     tempEnd = current;
                 }
-                else if (count > 10000) //EARLY EXIT
+                else if (count > 9000) //EARLY EXIT
                 {
                     //Debug.WriteLine("Early exit");
                     finding = false;

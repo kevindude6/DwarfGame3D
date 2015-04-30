@@ -13,6 +13,7 @@ using System.IO;
 using System.Xml;
 using BradGame3D.Art;
 using BradGame3D.PlayerInteraction;
+using BradGame3D.Entities.Creatures;
 
 namespace BradGame3D
 {
@@ -60,7 +61,11 @@ namespace BradGame3D
 
         private Vector3 mouseSelectStart;
         private Vector3 mouseSelectEnd;
-        private List<MouseIndicator> selectionList = new List<MouseIndicator>();
+        private bool currentlySelecting;
+
+        public SelectionManager selectionManager;
+        public List<Human> citizenList = new List<Human>();
+       // private List<MouseIndicator> selectionList = new List<MouseIndicator>();
         Random r;
         public bool loadedChunkThisFrame = false;
 
@@ -143,6 +148,11 @@ namespace BradGame3D
             pathingThread.IsBackground = true;
             pathingThread.Start();
 
+            selectionManager = new SelectionManager(this, w);
+            Thread selectThread = new Thread(new ThreadStart(selectionManager.workJobs));
+            selectThread.IsBackground = true;
+            selectThread.Start();
+
             loadThings();
             mCam = new Camera(this,w,graphics, new Vector3(256,120,256));
 
@@ -156,6 +166,8 @@ namespace BradGame3D
             sheetManager = new Art.SpriteSheetManager(this);
             sheetManager.loadSheet("Sprite_creature_squirrel",w);
             sheetManager.loadSheet("Sprite_creature_human",w);
+
+            
         }
         public void updateFrustum()
         {
@@ -290,14 +302,14 @@ namespace BradGame3D
                         //test.velocity.Z = (float)(r.NextDouble() * 10 - 5);
          
                         tsheet.addEnt(test);
-                        
+                        citizenList.Add((Human)test);
                         //mouseReady = false;
                         DEBUGnuments++;
                         
                         
                         //w.setBlockData(100,(int) Chunk.DATA.LIGHT, a);
                         //mouseSelectStart = a;
-                        //mouseReady = false;
+                        mouseReady = false;
                         
 
                     }
@@ -307,66 +319,31 @@ namespace BradGame3D
                     Vector3 a = blockCastTarget;
                     if (!Vector3.Equals(a, new Vector3(-1, -1, -1)))
                     {
-                        //w.makeTree(a + lookFace);
-                        //SpriteSheetEnhanced tsheet;
-                        //sheetManager.dict.TryGetValue("Squirrel", out tsheet);
-                        //tsheet.addEnt(new BasicEntity(a + lookFace));
+                       
                         Vector3 temp = a + lookFace;
-                        //end = new AI.Pathing.Node((int)temp.X, (int)temp.Y, (int)temp.Z);
-
+                      
                         //w.setBlockData((byte)0, (int)Chunk.DATA.ID, a);
-                        
-                        //test.followPath(AI.Pathing.Pathing.findPath(test.center,temp,w));
-                        
+                    
+                        /*
                         SpriteSheetEnhanced tsheet;
                         sheetManager.dict.TryGetValue(Entities.Creatures.Human.SheetName, out tsheet);
-                        //AI.Pathing.PathingManager.data.Clear();
+                        
                         foreach (LivingEntity e in tsheet.ents)
                         {
                             e.finalTarget = temp;
-                            /*
-                            AI.Pathing.PathData p;
-                            p.start = e.center;
-                            p.end = temp;
-                            p.b = e;
-                            AI.Pathing.PathingManager.data.Add(p);
-                             */
                         }
                        
-                        /*
-                        mouseSelectEnd = a;
-                        int xSign = Math.Sign(mouseSelectEnd.X - mouseSelectStart.X); if (xSign == 0) xSign = 1;
-                        int ySign = Math.Sign(mouseSelectEnd.Y - mouseSelectStart.Y); if (ySign == 0) ySign = 1;
-                        int zSign = Math.Sign(mouseSelectEnd.Z - mouseSelectStart.Z); if (zSign == 0) zSign = 1;
-                        for (int x = (int)Math.Round(mouseSelectStart.X); x != (int)Math.Round(mouseSelectEnd.X)+xSign; x+= 1*xSign)
-                        {
-                            for (int z= (int)Math.Round(mouseSelectStart.Z); z != (int)Math.Round(mouseSelectEnd.Z)+zSign; z+= 1*zSign)
-                            {
-                                for (int y = (int)Math.Round(mouseSelectStart.Y); y != (int)Math.Round(mouseSelectEnd.Y)+ySign; y+= 1*ySign)
-                                {
-                                    if(w.isRender(x,y,z))
-                                    {
-                                        MouseIndicator tempInd = new MouseIndicator(game);
-                                        tempInd.setPosition(new Vector3(x, y, z));
-                                        selectionList.Add(tempInd);
-                                        //w.setBlockData(0, (int) Chunk.DATA.ID, new Vector3(x,y,z));
-                                    }
-                                }
-                            }
-                        }
-                         */
-                      
                         mouseReady = false;
-                        /*
-                        if (start != null && end != null)
+                       */
+                        if (currentlySelecting == false)
                         {
-                            AI.Pathing.Path p = AI.Pathing.Pathing.findPath(start, end, w);
-                            foreach (AI.Pathing.Node n in p.nodeList)
-                            {
-                                tsheet.addEnt(new BasicEntity(new Vector3(n.x, n.y, n.z)));
-                            }
+                            mouseSelectStart = a;
+                            currentlySelecting = true;
                         }
-                        */
+                        else
+                        {
+                            mouseSelectEnd = a;
+                        }
                     }
 
                 }
@@ -374,6 +351,11 @@ namespace BradGame3D
                 if (currentMouseState.LeftButton == ButtonState.Released && currentMouseState.RightButton == ButtonState.Released)
                 {
                     mouseReady = true;
+                    if (currentlySelecting)
+                    {
+                        selectionManager.addSelection(mouseSelectStart, mouseSelectEnd, SelectionManager.JOBTYPE.MINING);
+                        currentlySelecting = false;
+                    }
                 }
 
                 if (mouseWheelPrevious < currentMouseState.ScrollWheelValue)
@@ -456,9 +438,12 @@ namespace BradGame3D
                 effect.Texture = mMouseIndicator.myTex;
                 pass.Apply();
                 mMouseIndicator.Draw(graphics);
-                foreach (MouseIndicator m in selectionList)
+                foreach (Selection s in selectionManager.selections)
                 {
-                    m.Draw(graphics);
+                    foreach(Selection.Job j in s.jobsInSelection)
+                    {
+                        j.m.Draw(graphics);
+                    }
                 }
             }
 

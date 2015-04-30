@@ -151,6 +151,7 @@
     <Compile Include="MenuThings\TerrainMenu.cs" />
     <Compile Include="PlayerInteraction\MouseIndicator.cs" />
     <Compile Include="PlayerInteraction\Camera.cs" />
+    <Compile Include="PlayerInteraction\Selection.cs" />
     <Compile Include="PlayerInteraction\SelectionManager.cs" />
     <Compile Include="PlayerInteraction\Utils.cs" />
     <Compile Include="RandomFunctions.cs" />
