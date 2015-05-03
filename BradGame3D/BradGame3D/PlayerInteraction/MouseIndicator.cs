@@ -98,7 +98,14 @@ namespace BradGame3D
             verts[34] = new VertexPositionColorTexture(backBottomRight + pos, mColor, BL);
             verts[35] = new VertexPositionColorTexture(backTopRight + pos, mColor, TL);
         }
-
+        public void updateColor(Color m)
+        {
+            mColor = m;
+            for (int i = 0; i < 36; i++)
+            {
+                verts[i].Color = mColor;
+            }
+        }
         public void Draw(GraphicsDeviceManager g)
         {
             g.GraphicsDevice.DrawUserPrimitives<VertexPositionColorTexture>(PrimitiveType.TriangleList, verts, 0, verts.Length / 3);

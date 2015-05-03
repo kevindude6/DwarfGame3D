@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using BradGame3D.AI.Pathing;
 using BradGame3D.Art;
 using System.Diagnostics;
+using BradGame3D.PlayerInteraction;
 
 namespace BradGame3D.Entities
 {
@@ -22,6 +23,7 @@ namespace BradGame3D.Entities
         public float currentSpeed = 0;
         private bool waitingForPath = false;
         static string[] anims = new string[] { "Idle", "Walk" };
+        public List<Event> eventQueue;
         public Path currentPath = null;
         public bool followingPath = false;
         public enum ANIMSTATES {IDLE,WALK};
@@ -36,6 +38,7 @@ namespace BradGame3D.Entities
         {
             collideable = true;
             setFinalTarget(-1, -1, -1);
+            eventQueue = new List<Event>();
         }
 
         public void followPath(Path p)
@@ -73,10 +76,15 @@ namespace BradGame3D.Entities
 
 
         }
+        public float distTo(Selection.Job j)
+        {
+            return (float)Math.Sqrt(Math.Pow((center.X-j.x),2) + Math.Pow(center.Y-j.y,2) + Math.Pow(center.Z-j.z,2));
+        }
         public override void update(float gameTime, World2 w)
         {
             base.update(gameTime,w);
 
+            //Debug.WriteLine(followingPath);
             currentLook = SpriteSheet.Direction.TOWARD;
             if (followingPath)
             {
@@ -90,14 +98,19 @@ namespace BradGame3D.Entities
                 if (currentPath.nodeList.Count() == 0)
                 {
                     followingPath = false;
-                    currentPath = null;
+                    //Debug.WriteLine(distTo(finalTarget));
 
-                    if (distTo(finalTarget) < pathTolerance)
+                    if (currentPath.endsSolid == false && distTo(finalTarget) < pathTolerance)
                     {
                         setFinalTarget(-1, -1, -1);
                         doOnArrive();
                     }
-                    
+                    else if (currentPath.endsSolid == true && distTo(finalTarget) - 0.5 < pathTolerance)
+                    {
+                        setFinalTarget(-1, -1, -1);
+                        doOnArrive();
+                    }
+                    currentPath = null;
                     //velocity = Vector3.Zero;
                 }
                 else
@@ -212,7 +225,13 @@ namespace BradGame3D.Entities
                 }
             }
 
-
+            if (eventQueue.Count > 0)
+            {
+                for (int i = eventQueue.Count - 1; i >= 0; i--)
+                {
+                    eventQueue[i].updateEvent(ref eventQueue, gameTime);
+                }
+            }
 
             //center += velocity * (gameTime / 1000f);
 

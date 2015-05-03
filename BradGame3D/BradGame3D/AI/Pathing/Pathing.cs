@@ -38,7 +38,9 @@ namespace BradGame3D.AI.Pathing
             SortedList<float, EnhancedNode> openList = new SortedList<float, EnhancedNode>(new DuplicateKeyComparer<float>());
             List<EnhancedNode> closedList = new List<EnhancedNode>();
 
-            if (GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, end.x, end.y, end.z)].getSolid())
+            //if (GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, end.x, end.y, end.z)].getSolid())
+            
+            if(!accessibleBlock(end.x,end.y,end.z,w))
             {
                 return null;
             }
@@ -53,6 +55,8 @@ namespace BradGame3D.AI.Pathing
             bool finding = true;
             EnhancedNode tempEnd = null ;
             int count = 0;
+            Path p = new Path();
+            if (w.isSolid(end.x, end.y, end.z)) p.endsSolid = true;
 
             //Debug.WriteLine("Start = " + st.toNode().ToString());
            // Debug.WriteLine("End = " + end.ToString());
@@ -65,12 +69,18 @@ namespace BradGame3D.AI.Pathing
                     return null;
                 }
                 EnhancedNode current = openList.First().Value;
-                if (current.Equals(end))
+                if (current.Equals(end) && p.endsSolid == false)
                 {
                     finding = false;
                     tempEnd = current;
                 }
-                else if (count > 9000) //EARLY EXIT
+                else if (getFlatHeuristic(current, end) == 1 && p.endsSolid == true)
+                {
+                    finding = false;
+                    tempEnd = current;
+                }
+
+                else if (count > 14000) //EARLY EXIT
                 {
                     //Debug.WriteLine("Early exit");
                     finding = false;
@@ -88,7 +98,7 @@ namespace BradGame3D.AI.Pathing
                     }
                     Node tnode = new Node(tempEnd.x, tempEnd.y, tempEnd.z);
                     return findPath(start, tnode, w);
-                        //Debug.WriteLine(n);
+                    //Debug.WriteLine(n);
                 }
                 else
                 {
@@ -97,7 +107,7 @@ namespace BradGame3D.AI.Pathing
                     {
                         EnhancedNode n = new EnhancedNode(t.x, t.y, t.z);
 
-                        if (!GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y, n.z)].getSolid() && (w.isSolid(n.x, n.y - 1, n.z) || w.isSolid(n.x,n.y-2,n.z)))
+                        if (!GameScreen.blockDataManager.blocks[(int)w.getBlockData((int)Chunk.DATA.ID, n.x, n.y, n.z)].getSolid() && (w.isSolid(n.x, n.y - 1, n.z) || w.isSolid(n.x, n.y - 2, n.z)))
                         {
                             float newCost = current.cost + getHeuristic(current, n.toNode());
 
@@ -124,7 +134,7 @@ namespace BradGame3D.AI.Pathing
                 }
             }
           
-            Path p = new Path();
+          
             p.nodeList.Add(tempEnd.toNode());
            // EnhancedNode t = tempEnd.parent;
             while (tempEnd.Equals(st) != true)
@@ -134,8 +144,15 @@ namespace BradGame3D.AI.Pathing
             }
             p.nodeList.Reverse();
             //Debug.WriteLine("count: " + count);
+            
             return p;
             
+        }
+        public static float getFlatHeuristic(EnhancedNode a, Node b)
+        {
+            return Math.Abs(a.x - b.x) + Math.Abs(a.y - b.y) + Math.Abs(a.z - b.z);
+            //return (float)Math.Sqrt(Math.Pow((a.x - b.x), 2) + Math.Pow((a.y - b.y), 2) + Math.Pow((a.z - b.z), 2));
+           
         }
         public static float getHeuristic(EnhancedNode a, Node b)
         {
@@ -227,6 +244,23 @@ namespace BradGame3D.AI.Pathing
             }
             //Debug.WriteLine("Created 6 more nodes");
             return temp;
+        }
+        public static bool accessibleBlock(int x, int y, int z, World2 world)
+        {
+            if (!world.isSolid(x - 1, y, z))
+                return true;
+            else if (!world.isSolid(x + 1, y, z))
+                return true;
+            else if (!world.isSolid(x, y, z + 1))
+                return true;
+            else if (!world.isSolid(x, y, z - 1))
+                return true;
+            else if (!world.isSolid(x, y + 1, z))
+                return true;
+            else if (!world.isSolid(x, y - 1, z) && world.isSolid(x, y - 2, z))
+                return true;
+            else
+                return false;
         }
     }
 }

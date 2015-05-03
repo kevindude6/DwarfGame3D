@@ -39,48 +39,53 @@ namespace BradGame3D.PlayerInteraction
                     for(int j = 0; j < selections.Count; j++)
                     {
                         s = selections[j];
-                        if (s.jobsInSelection.Count != 0)
+                        if (s != null)
                         {
-                            Selection.Job currentJob;
-                            for (int i = 0; i < s.jobsInSelection.Count; i++)
+                            if (s.jobsInSelection.Count != 0)
                             {
-                                currentJob = s.jobsInSelection[i];
-                                if (accessibleBlock(currentJob.x, currentJob.y, currentJob.z))
+                                Selection.Job currentJob;
+                                for (int i = 0; i < s.jobsInSelection.Count; i++)
                                 {
-                                    Human a = findLeastBusyCitizen(currentJob.jobType);
-                                    //Debug.WriteLine("Check 1");
-                                    if (a != null)
+                                    currentJob = s.jobsInSelection[i];
+                                    if (accessibleBlock(currentJob.x, currentJob.y, currentJob.z))
                                     {
+                                        Citizen a = findLeastBusyCitizen(currentJob);
+                                        //Debug.WriteLine("Check 1");
+                                        if (a != null)
+                                        {
 
-                                        s.jobsInSelection.RemoveAt(i);
-                                        i--;
-                                        a.tasks.Add(currentJob);
+                                            s.jobsInSelection.RemoveAt(i);
+                                            i--;
+                                            a.tasks.Add(currentJob);
+                                            //currentJob.m.updateColor(Color.Red);
+                                        }
                                     }
                                 }
                             }
-                        }
-                        else
-                        {
-                            selections.RemoveAt(j);
-                            j--;
+                            else
+                            {
+                                selections.RemoveAt(j);
+                                j--;
+                            }
                         }
                     }
                 }
             }
         }
-        public Human findLeastBusyCitizen(JOBTYPE j)
+        public Citizen findLeastBusyCitizen(Selection.Job j)
         {
-            Human h = null;
-            int leastTasks = 9999;
-            foreach (Human temp in gameScreen.citizenList)
+            Citizen h = null;
+            float leastScore = 9999;
+            foreach (Citizen temp in gameScreen.citizenList)
             {
                 //Debug.WriteLine("Check 1: " + temp.jobEnabled[0]);
-                if (temp.jobEnabled[(int)j])
+                if (temp.jobEnabled[(int)j.jobType])
                 {
                     //.WriteLine("Check 2");
-                    if (temp.tasks.Count() < leastTasks)
+                    float score = temp.tasks.Count()*2 + temp.distTo(j);
+                    if (score < leastScore)
                     {
-                        leastTasks = temp.tasks.Count;
+                        leastScore = score;
                         h = temp;
                     }
                 }
@@ -96,6 +101,10 @@ namespace BradGame3D.PlayerInteraction
             else if (!world.isSolid(x, y, z + 1))
                 return true;
             else if (!world.isSolid(x, y, z - 1))
+                return true;
+            else if (!world.isSolid(x, y + 1, z))
+                return true;
+            else if(!world.isSolid(x, y - 1, z) && world.isSolid(x,y-2,z) )
                 return true;
             else
                 return false;

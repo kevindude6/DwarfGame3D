@@ -110,10 +110,13 @@ namespace BradGame3D
                 }
                 
             }
+
+            VertexPositionColorTexture[] tempArray = vertices.ToArray();
             
-            canDraw = false;
+            
             faceCount = newfaceCount;
-            verticesArray = vertices.ToArray();
+            canDraw = false;
+            verticesArray = tempArray;
             isReady = true;
             canDraw = true;
 

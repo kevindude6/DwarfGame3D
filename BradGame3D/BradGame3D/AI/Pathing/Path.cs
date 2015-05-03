@@ -10,6 +10,7 @@ namespace BradGame3D.AI.Pathing
         //Node start;
         //Node end;
         public List<Node> nodeList;
+        public bool endsSolid = false;
         public Path()
         {
             nodeList = new List<Node>();

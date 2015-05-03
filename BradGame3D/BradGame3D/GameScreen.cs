@@ -64,7 +64,7 @@ namespace BradGame3D
         private bool currentlySelecting;
 
         public SelectionManager selectionManager;
-        public List<Human> citizenList = new List<Human>();
+        public List<Citizen> citizenList = new List<Citizen>();
        // private List<MouseIndicator> selectionList = new List<MouseIndicator>();
         Random r;
         public bool loadedChunkThisFrame = false;
@@ -294,15 +294,15 @@ namespace BradGame3D
                         
                         
                         SpriteSheetEnhanced tsheet;
-                        sheetManager.dict.TryGetValue(Entities.Creatures.Human.SheetName, out tsheet);
-                        test = new Entities.Creatures.Human(a + lookFace + new Vector3((float) (r.NextDouble() - 0.5f), 2, (float) (r.NextDouble()-0.5f)), 100);
+                        sheetManager.dict.TryGetValue(Entities.Creatures.Citizen.SheetName, out tsheet);
+                        test = new Entities.Creatures.Citizen(a + lookFace + new Vector3((float) (r.NextDouble() - 0.5f), 2, (float) (r.NextDouble()-0.5f)), 100);
                         
                         //test.velocity.X = (float) (r.NextDouble() * 10 - 5);
                         //test.velocity.Y = (float)(r.NextDouble() * 10 + 2);
                         //test.velocity.Z = (float)(r.NextDouble() * 10 - 5);
          
                         tsheet.addEnt(test);
-                        citizenList.Add((Human)test);
+                        citizenList.Add((Citizen)test);
                         //mouseReady = false;
                         DEBUGnuments++;
                         
@@ -438,11 +438,26 @@ namespace BradGame3D
                 effect.Texture = mMouseIndicator.myTex;
                 pass.Apply();
                 mMouseIndicator.Draw(graphics);
-                foreach (Selection s in selectionManager.selections)
+                lock (selectionManager)
                 {
-                    foreach(Selection.Job j in s.jobsInSelection)
+                    foreach (Selection s in selectionManager.selections)
                     {
-                        j.m.Draw(graphics);
+                        foreach (Selection.Job j in s.jobsInSelection)
+                        {
+                            j.m.Draw(graphics);
+                        }
+                    }
+                }
+                SpriteSheetEnhanced tsheet;
+                sheetManager.dict.TryGetValue(Entities.Creatures.Citizen.SheetName, out tsheet);
+                foreach (Citizen h in tsheet.ents)
+                {
+                    if (h.doingTask)
+                    {
+                        foreach (Selection.Job j in h.tasks)
+                        {
+                            j.m.Draw(graphics);
+                        }
                     }
                 }
             }
