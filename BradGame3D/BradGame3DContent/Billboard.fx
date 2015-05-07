@@ -40,6 +40,7 @@ float animationScaleFactor;
 // -1 means only accept transparent pixels.
 float alphaTestDirection = 1.0f;
 float alphaTestThreshold = 0.95f;
+float alphaValue = 1.0f;
 
 //-----------------------------------------------------------------------------
 // Textures.
@@ -111,6 +112,7 @@ void PS_Billboarding(in  float2 inTexCoord : TEXCOORD0,
 
 	// Apply the alpha test.
 	clip((outColor.a - alphaTestThreshold) * alphaTestDirection);
+	outColor = outColor*alphaValue;
 }
 
 //-----------------------------------------------------------------------------

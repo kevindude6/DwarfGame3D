@@ -127,6 +127,7 @@
     <Compile Include="AI\Pathing\Path.cs" />
     <Compile Include="AI\Pathing\Pathing.cs" />
     <Compile Include="AI\Pathing\PathingManager.cs" />
+    <Compile Include="Art\ParticleManager.cs" />
     <Compile Include="Art\SpriteSheetEnhanced.cs" />
     <Compile Include="Art\SpriteSheetManager.cs" />
     <Compile Include="BlockSector.cs" />
@@ -138,6 +139,7 @@
     <Compile Include="Entities\BillboardStuff.cs" />
     <Compile Include="Entities\Creatures\Citizen.cs" />
     <Compile Include="Entities\Creatures\Human.cs" />
+    <Compile Include="Entities\Creatures\Turtle.cs" />
     <Compile Include="Entities\Dwarf.cs" />
     <Compile Include="Entities\Event.cs" />
     <Compile Include="Entities\Flora\Shrub.cs" />

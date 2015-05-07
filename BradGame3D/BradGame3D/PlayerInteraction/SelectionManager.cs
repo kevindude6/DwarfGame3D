@@ -79,10 +79,10 @@ namespace BradGame3D.PlayerInteraction
             foreach (Citizen temp in gameScreen.citizenList)
             {
                 //Debug.WriteLine("Check 1: " + temp.jobEnabled[0]);
-                if (temp.jobEnabled[(int)j.jobType])
+                if (temp.jobEnabled[(int)j.jobType] && temp.doingTask == false)
                 {
                     //.WriteLine("Check 2");
-                    float score = temp.tasks.Count()*2 + temp.distTo(j);
+                    float score = temp.tasks.Count() + temp.distTo(j);
                     if (score < leastScore)
                     {
                         leastScore = score;

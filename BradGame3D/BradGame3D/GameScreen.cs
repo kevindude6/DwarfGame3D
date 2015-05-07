@@ -64,6 +64,7 @@ namespace BradGame3D
         private bool currentlySelecting;
 
         public SelectionManager selectionManager;
+        public ParticleManager particleMan;
         public List<Citizen> citizenList = new List<Citizen>();
        // private List<MouseIndicator> selectionList = new List<MouseIndicator>();
         Random r;
@@ -153,7 +154,10 @@ namespace BradGame3D
             selectThread.IsBackground = true;
             selectThread.Start();
 
+            
+
             loadThings();
+            particleMan = new ParticleManager(this);
             mCam = new Camera(this,w,graphics, new Vector3(256,120,256));
 
         }
@@ -182,6 +186,7 @@ namespace BradGame3D
                 mCam.doCameraGame();
                 updateFrustum();
                 updateEnts(gameTime);
+                particleMan.updateParticles(gameTime);
             }
           
         }
@@ -300,13 +305,15 @@ namespace BradGame3D
                         //test.velocity.X = (float) (r.NextDouble() * 10 - 5);
                         //test.velocity.Y = (float)(r.NextDouble() * 10 + 2);
                         //test.velocity.Z = (float)(r.NextDouble() * 10 - 5);
-         
+                        
+                        /*
                         tsheet.addEnt(test);
                         citizenList.Add((Citizen)test);
-                        //mouseReady = false;
+                       
                         DEBUGnuments++;
-                        
-                        
+                        */
+                        ParticleManager.Emitter e = new ParticleManager.Emitter(a, new Vector3(-0.25f, 0, -0.25f), new Vector3(0.25f, 0.5f, 0.25f), ParticleManager.ParticleType.BLOOD, 0.2f, 0.01f, 0.2f, 0.01f, 1000, 10, 1, new Vector3(0, -0.1f, 0), new Vector3(0, -0.1f, 0));
+                        particleMan.emitters.Add(e);
                         //w.setBlockData(100,(int) Chunk.DATA.LIGHT, a);
                         //mouseSelectStart = a;
                         mouseReady = false;
@@ -396,6 +403,7 @@ namespace BradGame3D
             billboardEffect.Parameters["view"].SetValue(View);
             billboardEffect.Parameters["projection"].SetValue(Projection);
             billboardEffect.Parameters["alphaTestDirection"].SetValue(1.0f);
+            billboardEffect.Parameters["alphaValue"].SetValue(1.0f);
 
             foreach (EffectPass pass in billboardEffect.Techniques["BillboardingCameraAligned"].Passes)
             {
@@ -408,6 +416,16 @@ namespace BradGame3D
                 
             }
         }
+        public void drawParticles(GameTime g)
+        {
+            foreach (EffectPass pass in billboardEffect.Techniques["BillboardingCameraAligned"].Passes)
+            {
+                billboardEffect.Parameters["colorMap"].SetValue(particleMan.particleSheet.getImage());
+                pass.Apply();
+                particleMan.draw(graphics, billboardEffect, pass);
+
+            }
+        }
         public void draw(GameTime g)
         {
             //tex = game.Content.Load<Texture2D>("Grass (1)");
@@ -418,10 +436,7 @@ namespace BradGame3D
                 effect.Texture = tex;
                 pass.Apply();
                 w.draw(graphics);
-/*
-                effect.Texture = treeTex;
-                pass.Apply();
-                w.drawTrees(graphics); */
+
             }
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {
@@ -431,7 +446,9 @@ namespace BradGame3D
                 w.drawTrees(graphics);
                 
             }
+
             drawEntities(g);
+            drawParticles(g);
 
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {

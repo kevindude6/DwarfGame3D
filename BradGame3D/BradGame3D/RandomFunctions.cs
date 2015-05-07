@@ -20,6 +20,14 @@ namespace BradGame3D
             double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
             return (float)(mean + stdDev * randStdNormal); //random normal(mean,stdDev^2)
         }
+        public static Vector3 vecBetweenMinMax(Random r, Vector3 min, Vector3 max)
+        {
+            Vector3 newVec= new Vector3(0,0,0);
+            newVec.X = (float)r.NextDouble() * (max.X - min.X) + min.X;
+            newVec.Y = (float)r.NextDouble() * (max.Y - min.Y) + min.Y;
+            newVec.Z = (float)r.NextDouble() * (max.Z - min.Z) + min.Z;
+            return newVec;
+        }
         public static Color randSaturatedColor(Random r)
         {
             
