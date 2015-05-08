@@ -147,7 +147,7 @@ namespace BradGame3D.Art
         {
             foreach (Particle p in particles)
             {
-                e.Parameters["alphaValue"].SetValue(p.life/p.maxLife);
+                e.Parameters["alphaValue"].SetValue(1 - (float) Math.Pow((p.maxLife-p.life)/p.maxLife,5));
                 pass.Apply();
                 g.GraphicsDevice.DrawUserPrimitives<BillboardVertex>(PrimitiveType.TriangleList, p.verts, 0, p.verts.Length / 3);
             }

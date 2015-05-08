@@ -63,6 +63,7 @@ namespace BradGame3D
         private Vector3 mouseSelectEnd;
         private bool currentlySelecting;
 
+        public static GameScreen thisScreen;
         public SelectionManager selectionManager;
         public ParticleManager particleMan;
         public List<Citizen> citizenList = new List<Citizen>();
@@ -76,6 +77,10 @@ namespace BradGame3D
         Art.SpriteSheetManager sheetManager;
 
         int currentBlock;
+        public static GameScreen getScreen()
+        {
+            return thisScreen;
+        }
         public void initBlockData()
         {
             int[] tempSideArray = { 0, 0, 0, 0, 0, 0 };
@@ -105,8 +110,8 @@ namespace BradGame3D
         public GameScreen(Game1 g)
         {
             initBlockData();
-            
 
+            thisScreen = this;
             game = g;
             graphics = game.graphics;
             
@@ -306,14 +311,13 @@ namespace BradGame3D
                         //test.velocity.Y = (float)(r.NextDouble() * 10 + 2);
                         //test.velocity.Z = (float)(r.NextDouble() * 10 - 5);
                         
-                        /*
+                        
                         tsheet.addEnt(test);
                         citizenList.Add((Citizen)test);
                        
                         DEBUGnuments++;
-                        */
-                        ParticleManager.Emitter e = new ParticleManager.Emitter(a, new Vector3(-0.25f, 0, -0.25f), new Vector3(0.25f, 0.5f, 0.25f), ParticleManager.ParticleType.BLOOD, 0.2f, 0.01f, 0.2f, 0.01f, 1000, 10, 1, new Vector3(0, -0.1f, 0), new Vector3(0, -0.1f, 0));
-                        particleMan.emitters.Add(e);
+                        
+                        
                         //w.setBlockData(100,(int) Chunk.DATA.LIGHT, a);
                         //mouseSelectStart = a;
                         mouseReady = false;

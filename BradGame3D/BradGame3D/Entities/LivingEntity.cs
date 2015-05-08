@@ -80,6 +80,11 @@ namespace BradGame3D.Entities
         {
             return (float)Math.Sqrt(Math.Pow((center.X-j.x),2) + Math.Pow(center.Y-j.y,2) + Math.Pow(center.Z-j.z,2));
         }
+        public void bleed()
+        {
+            ParticleManager.Emitter e = new ParticleManager.Emitter(center, new Vector3(-0.25f, 0, -0.25f), new Vector3(0.25f, 0.5f, 0.25f), ParticleManager.ParticleType.BLOOD, 0.2f, 0.01f, 0.2f, 0.01f, 1000, 20, 1, new Vector3(0, -0.1f, 0), new Vector3(0, -0.1f, 0));
+            GameScreen.getScreen().particleMan.emitters.Add(e);
+        }
         public override void update(float gameTime, World2 w)
         {
             base.update(gameTime,w);

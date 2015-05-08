@@ -45,6 +45,7 @@ namespace BradGame3D.Entities.Creatures
             if(tasks.Contains(currentTask))
                 tasks.Remove(currentTask);
             doingTask = false;
+            bleed();
         }
         public override void update(float gameTime, World2 w)
         {

@@ -35,11 +35,11 @@ namespace BradGame3D.Entities
         public SpriteSheet.Direction currentLook = SpriteSheet.Direction.RIGHT;
 
         public static string SheetName = "Squirrel";
-
+        //public GameScreen gameScreen;
         public BasicEntity(Vector3 pos)
         {
             //collideRadius = renderWidth / 2;
-
+            //gameScreen = g;
             initSize();
             collideSquared = collideRadius * collideRadius;
             center = pos;
