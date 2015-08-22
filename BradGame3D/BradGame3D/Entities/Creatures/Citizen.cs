@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using BradGame3D.PlayerInteraction;
 using System.Diagnostics;
+using BradGame3D.Art;
 
 namespace BradGame3D.Entities.Creatures
 {
@@ -41,11 +42,15 @@ namespace BradGame3D.Entities.Creatures
         public void doMine()
         {
             parentChunk.world.setBlockData((byte) 0, (int) Chunk.DATA.ID, currentTask.x, currentTask.y, currentTask.z);
-            setFinalTarget(-1, -1, -1);
+            
             if(tasks.Contains(currentTask))
                 tasks.Remove(currentTask);
             doingTask = false;
-            bleed();
+            ParticleManager.Emitter e = new ParticleManager.Emitter(new Vector3(currentTask.x,currentTask.y,currentTask.z),0.5f, new Vector3(-0.25f, 0, -0.25f), new Vector3(0.25f, 0.5f, 0.25f), ParticleManager.ParticleType.DUST, 0.2f, 0.01f, 0.2f, 0.01f, 500, 4, 1, new Vector3(0, -0.25f, 0), new Vector3(0, -0.25f, 0));
+            GameScreen.getScreen().particleMan.emitters.Add(e);
+            //bleed();
+
+            setFinalTarget(-1, -1, -1);
         }
         public override void update(float gameTime, World2 w)
         {

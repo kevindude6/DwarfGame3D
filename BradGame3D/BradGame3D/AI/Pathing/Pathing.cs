@@ -80,7 +80,7 @@ namespace BradGame3D.AI.Pathing
                     tempEnd = current;
                 }
 
-                else if (count > 14000) //EARLY EXIT
+                else if (count > 25000) //EARLY EXIT 14000
                 {
                     //Debug.WriteLine("Early exit");
                     finding = false;
@@ -90,9 +90,9 @@ namespace BradGame3D.AI.Pathing
 
                     foreach (EnhancedNode n in openList.Values)
                     {
-                        if (getHeuristic(n, end) < min)
+                        if (getYModdedHeuristic(n, end) < min)
                         {
-                            min = getHeuristic(n, end);
+                            min = getYModdedHeuristic(n, end);
                             tempEnd = n;
                         }
                     }
@@ -153,6 +153,11 @@ namespace BradGame3D.AI.Pathing
             return Math.Abs(a.x - b.x) + Math.Abs(a.y - b.y) + Math.Abs(a.z - b.z);
             //return (float)Math.Sqrt(Math.Pow((a.x - b.x), 2) + Math.Pow((a.y - b.y), 2) + Math.Pow((a.z - b.z), 2));
            
+        }
+        public static float getYModdedHeuristic(EnhancedNode a, Node b)
+        {
+            //return Math.Abs(a.x - b.x) + Math.Abs(a.y - b.y) + Math.Abs(a.z - b.z);
+            return (float)Math.Sqrt(Math.Pow((a.x - b.x), 2) + Math.Pow((a.y - b.y), 3) + Math.Pow((a.z - b.z), 2));
         }
         public static float getHeuristic(EnhancedNode a, Node b)
         {

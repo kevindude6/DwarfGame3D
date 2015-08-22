@@ -30,7 +30,9 @@ namespace BradGame3D.Art
         }
         public class Emitter
         {
-            public Vector3 pos;
+            public Vector3 minPos;
+            public Vector3 maxPos;
+            public float posRadius;
             public Vector3 velMin;
             public Vector3 velMax;
             public Vector3 accelMin;
@@ -46,9 +48,12 @@ namespace BradGame3D.Art
             public float timeSinceLastParticle;
             public Random r;
 
-            public Emitter(Vector3 p, Vector3 vmin, Vector3 vmax, ParticleType t, float wM, float wD, float hM, float hD, float l, int pCount, float eSpeed, Vector3 aMin, Vector3 aMax)
+            public Emitter(Vector3 p, float pRad, Vector3 vmin, Vector3 vmax, ParticleType t, float wM, float wD, float hM, float hD, float l, int pCount, float eSpeed, Vector3 aMin, Vector3 aMax)
             {
-                pos = p;
+                minPos = p - new Vector3(pRad, pRad, pRad);
+                maxPos = p + new Vector3(pRad,pRad,pRad);
+                
+                posRadius = pRad;
                 velMin = vmin;
                 velMax = vmax;
                 accelMax = aMax;
@@ -106,7 +111,8 @@ namespace BradGame3D.Art
                 {
                     Vector3 vel = RandomFunctions.vecBetweenMinMax(e.r,e.velMin,e.velMax);
                     Vector3 accel = RandomFunctions.vecBetweenMinMax(e.r,e.accelMin,e.accelMin);
-                    makeParticle(e.type, e.pos, vel, accel, 0, e.life, RandomFunctions.Normal(e.r, e.widthDev, e.widthMean), RandomFunctions.Normal(e.r, e.heightDev, e.heightMean));
+                    Vector3 pos = RandomFunctions.vecBetweenMinMax(e.r, e.minPos, e.maxPos);
+                    makeParticle(e.type, pos, vel, accel, 0, e.life, RandomFunctions.Normal(e.r, e.widthDev, e.widthMean), RandomFunctions.Normal(e.r, e.heightDev, e.heightMean));
                     e.timeSinceLastParticle -= e.emitSpeed;
                     e.particleEmitCount -= 1;
                     if (e.particleEmitCount <= 0)
