@@ -63,6 +63,7 @@ namespace BradGame3D
         private Vector3 mouseSelectEnd;
         private bool currentlySelecting;
 
+        public PlayerInteraction.GuiLibrary.Gui gui;
         public static GameScreen thisScreen;
         public SelectionManager selectionManager;
         public ParticleManager particleMan;
@@ -161,8 +162,11 @@ namespace BradGame3D
 
             
 
-            loadThings();
             particleMan = new ParticleManager(this);
+            gui = new PlayerInteraction.GuiLibrary.Gui(this);
+
+            loadThings();
+            
             mCam = new Camera(this,w,graphics, new Vector3(256,120,256));
 
         }
@@ -171,6 +175,8 @@ namespace BradGame3D
             tex = game.Content.Load<Texture2D>("bradgameblocks");
             treeTex = game.Content.Load<Texture2D>("floraspritesheet");
             dogeTex = game.Content.Load<Texture2D>("dogecoin-300");
+            gui.loadGuiTex();
+
 
             sheetManager = new Art.SpriteSheetManager(this);
             sheetManager.loadSheet("Sprite_creature_squirrel",w);
@@ -492,6 +498,7 @@ namespace BradGame3D
                 updateTimes.RemoveAt(0);
             game.spriteBatch.Begin();
             game.spriteBatch.DrawString(game.Content.Load<SpriteFont>("sego"), "x " + mCam.camPos.X + "\nz: " + mCam.camPos.Z + "\nFPS: " + 1/updateTimes.Average() + "\nNumber of ents: " + DEBUGnuments, new Vector2(0, 0), Color.White);
+            
             game.spriteBatch.End();
         }
     }

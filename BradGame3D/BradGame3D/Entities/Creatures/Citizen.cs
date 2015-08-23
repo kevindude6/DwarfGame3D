@@ -35,7 +35,7 @@ namespace BradGame3D.Entities.Creatures
         {
             switch (currentTask.jobType)
             {
-                case SelectionManager.JOBTYPE.MINING: eventQueue.Add(new Event(100, doMine)); break;
+                case SelectionManager.JOBTYPE.MINING: eventQueue.Add(new Event(250, doMine)); break;
                 //case SelectionManager.JOBTYPE.MINING: eventQueue.Add(new Event(100,delegate(){this.doMine();})); break;
             }
         }
