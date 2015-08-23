@@ -10,9 +10,25 @@ namespace BradGame3D.PlayerInteraction.GuiLibrary
     {
         GameScreen gameScreen;
         public Texture2D guiTexture;
+        public List<Component> components;
         public Gui(GameScreen g)
         {
             gameScreen = g;
+            components = new List<Component>();
+
+            Component test = new Component(this);
+            ComponentBounds b;
+            b.textureWidth = 1920;
+            b.textureHeight = 216;
+            b.textureX = 0;
+            b.textureY = 0;
+
+            b.heightAsPercent = 0.135f;
+            b.widthAsPercent = 1f;
+            b.xAsPercent = 0f;
+            b.yAsPercent = 0.9f;
+            test.setBounds(b);
+            components.Add(test);
         }
         public void loadGuiTex()
         {
@@ -25,6 +41,13 @@ namespace BradGame3D.PlayerInteraction.GuiLibrary
         public int getScreenHeight()
         {
             return gameScreen.game.Window.ClientBounds.Height;
+        }
+        public void drawGui(SpriteBatch b)
+        {
+            foreach (Component c in components)
+            {
+                c.drawComponent(b);
+            }
         }
     }
 }

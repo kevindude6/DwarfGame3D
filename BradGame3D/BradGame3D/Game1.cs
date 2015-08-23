@@ -35,7 +35,7 @@ namespace BradGame3D
             graphics.PreferredBackBufferWidth = 1920;
             graphics.PreferredBackBufferHeight = 1080;
 
-            graphics.IsFullScreen = false;
+            graphics.IsFullScreen = true;
             this.IsFixedTimeStep = false;
             graphics.SynchronizeWithVerticalRetrace = false;
 

@@ -498,7 +498,7 @@ namespace BradGame3D
                 updateTimes.RemoveAt(0);
             game.spriteBatch.Begin();
             game.spriteBatch.DrawString(game.Content.Load<SpriteFont>("sego"), "x " + mCam.camPos.X + "\nz: " + mCam.camPos.Z + "\nFPS: " + 1/updateTimes.Average() + "\nNumber of ents: " + DEBUGnuments, new Vector2(0, 0), Color.White);
-            
+            gui.drawGui(game.spriteBatch);
             game.spriteBatch.End();
         }
     }

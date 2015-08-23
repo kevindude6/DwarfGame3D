@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace BradGame3D.PlayerInteraction.GuiLibrary
 {
-    struct ComponentBounds
+    public struct ComponentBounds
     {
         public float xAsPercent;
         public float yAsPercent;
