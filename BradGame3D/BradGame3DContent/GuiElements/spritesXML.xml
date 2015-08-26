@@ -1,0 +1,6 @@
+
+<TextureAtlas imagePath="sprites.png">
+	<SubTexture name="BuildIcon.png" x="0" y="135" width="125" height="139"/>
+	<SubTexture name="DigIcon.png" x="0" y="276" width="69" height="153"/>
+	<SubTexture name="MainBar.png" x="0" y="0" width="1916" height="133"/>
+</TextureAtlas>

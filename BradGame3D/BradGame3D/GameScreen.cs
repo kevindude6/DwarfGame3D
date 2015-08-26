@@ -39,6 +39,7 @@ namespace BradGame3D
         private GraphicsDeviceManager graphics;
 
         private KeyboardState oldKeyState;
+        private MouseState currentMouseState;
         private MouseState originalMouseState;
         private int mouseWheelPrevious;
         private bool mouseReady;
@@ -50,7 +51,6 @@ namespace BradGame3D
         public BoundingFrustum frustum;
         public Texture2D tex;
         public Texture2D treeTex;
-        public Texture2D dogeTex;
 
         public Camera mCam;
         public LivingEntity test;
@@ -123,6 +123,7 @@ namespace BradGame3D
 
             Mouse.SetPosition(game.Window.ClientBounds.Width / 2, game.Window.ClientBounds.Height / 2);
             originalMouseState = Mouse.GetState();
+            currentMouseState = Mouse.GetState();
             mouseWheelPrevious = originalMouseState.ScrollWheelValue;
             oldKeyState = Keyboard.GetState();
             mMouseIndicator = new MouseIndicator(game);
@@ -174,8 +175,8 @@ namespace BradGame3D
         {
             tex = game.Content.Load<Texture2D>("bradgameblocks");
             treeTex = game.Content.Load<Texture2D>("floraspritesheet");
-            dogeTex = game.Content.Load<Texture2D>("dogecoin-300");
-            gui.loadGuiTex();
+            
+            //gui.loadGuiTex();
 
 
             sheetManager = new Art.SpriteSheetManager(this);
@@ -282,90 +283,59 @@ namespace BradGame3D
                     w.setBlockData((byte)currentBlock, (int)Chunk.DATA.ID, a+lookFace);
                 }
             }
-           
 
-            MouseState currentMouseState = Mouse.GetState();
-
+            originalMouseState = currentMouseState;
+            currentMouseState = Mouse.GetState();
+            //Console.WriteLine("Mouse: (" + currentMouseState.X + "," + currentMouseState.Y + ")");
 
             if (currentMouseState != originalMouseState)
             {
                 if(mCam.raycastBlock(ref blockCastTarget,ref lookFace))
                     mMouseIndicator.setPosition(blockCastTarget);
-                if (mouseEnabled)
+                if (currentMouseState.RightButton == ButtonState.Pressed)
                 {
                     float xDifference = currentMouseState.X - originalMouseState.X;
                     float yDifference = currentMouseState.Y - originalMouseState.Y;
                     mCam.yaw-= rotationSpeed * xDifference;
                     mCam.pitch -= rotationSpeed * yDifference;
-                    Mouse.SetPosition(game.Window.ClientBounds.Width / 2, game.Window.ClientBounds.Height / 2);
+                    //Mouse.SetPosition(game.Window.ClientBounds.Width / 2, game.Window.ClientBounds.Height / 2);
 
                 }
-                
-         
-                if (currentMouseState.LeftButton == ButtonState.Pressed && mouseReady)
-                {
-                    Vector3 a = blockCastTarget;
-                    if (!Vector3.Equals(a, new Vector3(-1, -1, -1)))
-                    {
-                        
-                        
-                        SpriteSheetEnhanced tsheet;
-                        sheetManager.dict.TryGetValue(Entities.Creatures.Citizen.SheetName, out tsheet);
-                        test = new Entities.Creatures.Citizen(a + lookFace + new Vector3((float) (r.NextDouble() - 0.5f), 2, (float) (r.NextDouble()-0.5f)), 100);
-                        
-                        //test.velocity.X = (float) (r.NextDouble() * 10 - 5);
-                        //test.velocity.Y = (float)(r.NextDouble() * 10 + 2);
-                        //test.velocity.Z = (float)(r.NextDouble() * 10 - 5);
-                        
-                        
-                        tsheet.addEnt(test);
-                        citizenList.Add((Citizen)test);
-                       
-                        DEBUGnuments++;
-                        
-                        
-                        //w.setBlockData(100,(int) Chunk.DATA.LIGHT, a);
-                        //mouseSelectStart = a;
-                        mouseReady = false;
-                        
 
+                if (gui.checkClick(currentMouseState.X, currentMouseState.Y))
+                {
+
+                }
+                else
+                {
+                    if (currentMouseState.LeftButton == ButtonState.Pressed && mouseReady)
+                    {
+                        Vector3 a = blockCastTarget;
+                        if (!Vector3.Equals(a, new Vector3(-1, -1, -1)))
+                        {
+
+
+                            SpriteSheetEnhanced tsheet;
+                            sheetManager.dict.TryGetValue(Entities.Creatures.Citizen.SheetName, out tsheet);
+                            test = new Entities.Creatures.Citizen(a + lookFace + new Vector3((float)(r.NextDouble() - 0.5f), 2, (float)(r.NextDouble() - 0.5f)), 100);
+
+                            test.velocity.X = (float) (r.NextDouble() * 10 - 5);
+                            test.velocity.Y = (float)(r.NextDouble() * 10 + 2);
+                            test.velocity.Z = (float)(r.NextDouble() * 10 - 5);
+
+
+                            tsheet.addEnt(test);
+                            citizenList.Add((Citizen)test);
+
+                            DEBUGnuments++;
+                            mouseReady = false;
+
+
+                        }
                     }
                 }
-                if (currentMouseState.RightButton == ButtonState.Pressed && mouseReady)
-                {
-                    Vector3 a = blockCastTarget;
-                    if (!Vector3.Equals(a, new Vector3(-1, -1, -1)))
-                    {
-                       
-                        Vector3 temp = a + lookFace;
-                      
-                        //w.setBlockData((byte)0, (int)Chunk.DATA.ID, a);
-                    
-                        /*
-                        SpriteSheetEnhanced tsheet;
-                        sheetManager.dict.TryGetValue(Entities.Creatures.Human.SheetName, out tsheet);
-                        
-                        foreach (LivingEntity e in tsheet.ents)
-                        {
-                            e.finalTarget = temp;
-                        }
-                       
-                        mouseReady = false;
-                       */
-                        if (currentlySelecting == false)
-                        {
-                            mouseSelectStart = a;
-                            currentlySelecting = true;
-                        }
-                        else
-                        {
-                            mouseSelectEnd = a;
-                        }
-                    }
-
-                }
                 
-                if (currentMouseState.LeftButton == ButtonState.Released && currentMouseState.RightButton == ButtonState.Released)
+                if (currentMouseState.LeftButton == ButtonState.Released)
                 {
                     mouseReady = true;
                     if (currentlySelecting)

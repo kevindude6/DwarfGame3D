@@ -27,14 +27,22 @@ namespace BradGame3D.PlayerInteraction.GuiLibrary
         public Rectangle drawRect;
         public Rectangle textRect;
         public ComponentBounds bounds;
-        public Component(Gui g) : this(g, null)
+        public string name;
+        public bool AbsolutePositioning = false;
+        public Component(Gui g,string img) : this(g, null, img)
         {
 
         }
-        public Component(Gui g, Component PARENT)
+        public Component(Gui g, Component PARENT, string img)
         {
             gui = g;
             parent = PARENT;
+            name = img;
+            bounds.textureX = gui.texAtlas.textures[name].x;
+            bounds.textureY = gui.texAtlas.textures[name].y;
+            bounds.textureWidth = gui.texAtlas.textures[name].width;
+            bounds.textureHeight = gui.texAtlas.textures[name].height;
+
             children = new List<Component>();
            
         }
@@ -44,11 +52,6 @@ namespace BradGame3D.PlayerInteraction.GuiLibrary
             bounds.yAsPercent = b.yAsPercent;
             bounds.widthAsPercent = b.widthAsPercent;
             bounds.heightAsPercent = b.heightAsPercent;
-
-            bounds.textureX = b.textureX;
-            bounds.textureY = b.textureY;
-            bounds.textureWidth = b.textureWidth;
-            bounds.textureHeight = b.textureHeight;
 
 
             textRect = new Rectangle((int)bounds.textureX, (int)bounds.textureY, (int)bounds.textureWidth, (int)bounds.textureHeight);
@@ -97,6 +100,21 @@ namespace BradGame3D.PlayerInteraction.GuiLibrary
             {
                 c.drawComponent(spriteBatch);
             }
+        }
+        public bool wasClicked(int x, int y)
+        {
+            foreach (Component c in children)
+            {
+                if (c.wasClicked(x, y)) return true;
+            }
+            if (drawRect.Contains(x, y))
+            {
+
+                return true;
+            }
+            else
+                return false;
+
         }
     }
 }

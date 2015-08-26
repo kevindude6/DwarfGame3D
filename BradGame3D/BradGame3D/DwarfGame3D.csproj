@@ -154,6 +154,7 @@
     <Compile Include="MenuThings\TerrainMenu.cs" />
     <Compile Include="PlayerInteraction\GuiLibrary\Component.cs" />
     <Compile Include="PlayerInteraction\GuiLibrary\Gui.cs" />
+    <Compile Include="PlayerInteraction\GuiLibrary\GuiTextureAtlas.cs" />
     <Compile Include="PlayerInteraction\MouseIndicator.cs" />
     <Compile Include="PlayerInteraction\Camera.cs" />
     <Compile Include="PlayerInteraction\Selection.cs" />

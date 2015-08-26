@@ -32,16 +32,16 @@ namespace BradGame3D
             graphics = new GraphicsDeviceManager(this);
 
             
-            graphics.PreferredBackBufferWidth = 1920;
-            graphics.PreferredBackBufferHeight = 1080;
+            graphics.PreferredBackBufferWidth = 1440;
+            graphics.PreferredBackBufferHeight = 810;
 
-            graphics.IsFullScreen = true;
+            graphics.IsFullScreen = false;
             this.IsFixedTimeStep = false;
             graphics.SynchronizeWithVerticalRetrace = false;
 
             graphics.ApplyChanges();
-            
 
+            Mouse.WindowHandle = Window.Handle;
 
             Content.RootDirectory = "Content";
         }
