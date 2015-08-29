@@ -1,6 +1,9 @@
-
 <TextureAtlas imagePath="sprites.png">
-	<SubTexture name="BuildIcon.png" x="0" y="135" width="125" height="139"/>
-	<SubTexture name="DigIcon.png" x="0" y="276" width="69" height="153"/>
-	<SubTexture name="MainBar.png" x="0" y="0" width="1916" height="133"/>
+	<SubTexture name="BuildIcon.png" x="0" y="278" width="128" height="128"/>
+	<SubTexture name="DigIcon.png" x="0" y="148" width="128" height="128"/>
+	<SubTexture name="DirtIcon.png" x="0" y="442" width="32" height="32"/>
+	<SubTexture name="GrassIcon.png" x="34" y="408" width="32" height="32"/>
+	<SubTexture name="MainBar.png" x="0" y="0" width="1916" height="146"/>
+	<SubTexture name="StoneBrickIcon.png" x="0" y="408" width="32" height="32"/>
+	<SubTexture name="StoneIcon.png" x="0" y="476" width="32" height="32"/>
 </TextureAtlas>

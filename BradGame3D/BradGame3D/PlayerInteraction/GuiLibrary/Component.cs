@@ -22,13 +22,15 @@ namespace BradGame3D.PlayerInteraction.GuiLibrary
     public class Component
     {
         private Component parent = null;
-        private Gui gui;
-        private List<Component> children;
+        protected Gui gui;
+        protected List<Component> children;
         public Rectangle drawRect;
         public Rectangle textRect;
         public ComponentBounds bounds;
+        public string texName;
         public string name;
         public bool AbsolutePositioning = false;
+        public bool visible = true;
         public Component(Gui g,string img) : this(g, null, img)
         {
 
@@ -37,26 +39,43 @@ namespace BradGame3D.PlayerInteraction.GuiLibrary
         {
             gui = g;
             parent = PARENT;
-            name = img;
-            bounds.textureX = gui.texAtlas.textures[name].x;
-            bounds.textureY = gui.texAtlas.textures[name].y;
-            bounds.textureWidth = gui.texAtlas.textures[name].width;
-            bounds.textureHeight = gui.texAtlas.textures[name].height;
+            texName = img;
+            bounds.textureX = gui.texAtlas.textures[texName].x;
+            bounds.textureY = gui.texAtlas.textures[texName].y;
+            bounds.textureWidth = gui.texAtlas.textures[texName].width;
+            bounds.textureHeight = gui.texAtlas.textures[texName].height;
+
+            textRect = new Rectangle((int)bounds.textureX, (int)bounds.textureY, (int)bounds.textureWidth, (int)bounds.textureHeight);
 
             children = new List<Component>();
            
         }
+        public void setBounds(float x, float y, float w, float h)
+        {
+            bounds.xAsPercent = x;
+            bounds.yAsPercent = y;
+            bounds.widthAsPercent = w;
+            bounds.heightAsPercent = h;
+
+
+            
+
+            if (AbsolutePositioning || parent == null)
+            {
+                drawRect = new Rectangle((int)(bounds.xAsPercent * gui.getScreenWidth()), (int)(bounds.yAsPercent * gui.getScreenHeight()),
+                (int)(bounds.widthAsPercent * gui.getScreenWidth()), (int)(bounds.heightAsPercent * gui.getScreenHeight()));
+            }
+            else
+            {
+                drawRect = new Rectangle((int)(bounds.xAsPercent * parent.drawRect.Width) + parent.drawRect.X, 
+                    (int)(bounds.yAsPercent * parent.drawRect.Height)+ parent.drawRect.Y,
+                    (int)(bounds.widthAsPercent * parent.drawRect.Width), 
+                    (int)(bounds.heightAsPercent * parent.drawRect.Height));
+            }
+        }
         public void setBounds(ComponentBounds b)
         {
-            bounds.xAsPercent = b.xAsPercent;
-            bounds.yAsPercent = b.yAsPercent;
-            bounds.widthAsPercent = b.widthAsPercent;
-            bounds.heightAsPercent = b.heightAsPercent;
-
-
-            textRect = new Rectangle((int)bounds.textureX, (int)bounds.textureY, (int)bounds.textureWidth, (int)bounds.textureHeight);
-            drawRect = new Rectangle((int)(bounds.xAsPercent * gui.getScreenWidth()), (int)(bounds.yAsPercent * gui.getScreenHeight()),
-                (int)(bounds.widthAsPercent * gui.getScreenWidth()), (int)(bounds.heightAsPercent * gui.getScreenHeight()));
+            setBounds(b.xAsPercent, b.yAsPercent, b.widthAsPercent, b.heightAsPercent);
         }
         public bool addComponent(Component t)
         {
@@ -83,11 +102,14 @@ namespace BradGame3D.PlayerInteraction.GuiLibrary
         }
         public void drawComponent(SpriteBatch spriteBatch)
         {
-            drawSelf(spriteBatch);
-            drawChildren(spriteBatch);
-            foreach(Component c in children)
+            if (visible)
             {
-                c.drawComponent(spriteBatch);
+                drawSelf(spriteBatch);
+                drawChildren(spriteBatch);
+                foreach (Component c in children)
+                {
+                    c.drawComponent(spriteBatch);
+                }
             }
         }
         public virtual void drawSelf(SpriteBatch spriteBatch)
@@ -101,19 +123,28 @@ namespace BradGame3D.PlayerInteraction.GuiLibrary
                 c.drawComponent(spriteBatch);
             }
         }
+        public virtual void doClick()
+        {
+
+        }
         public bool wasClicked(int x, int y)
         {
-            foreach (Component c in children)
+            if (visible)
             {
-                if (c.wasClicked(x, y)) return true;
+                foreach (Component c in children)
+                {
+                    if (c.wasClicked(x, y)) return true;
+                }
+                if (drawRect.Contains(x, y))
+                {
+                    Console.WriteLine("Component: " + texName + " was clicked!");
+                    doClick();
+                    return true;
+                }
+                else
+                    return false;
             }
-            if (drawRect.Contains(x, y))
-            {
-
-                return true;
-            }
-            else
-                return false;
+            return false;
 
         }
     }

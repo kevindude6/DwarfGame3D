@@ -152,9 +152,12 @@
     <Compile Include="MenuThings\MenuComponent.cs" />
     <Compile Include="MenuThings\MenuScreen.cs" />
     <Compile Include="MenuThings\TerrainMenu.cs" />
+    <Compile Include="PlayerInteraction\GuiLibrary\Button.cs" />
     <Compile Include="PlayerInteraction\GuiLibrary\Component.cs" />
     <Compile Include="PlayerInteraction\GuiLibrary\Gui.cs" />
     <Compile Include="PlayerInteraction\GuiLibrary\GuiTextureAtlas.cs" />
+    <Compile Include="PlayerInteraction\GuiLibrary\MenuBar.cs" />
+    <Compile Include="PlayerInteraction\MouseController.cs" />
     <Compile Include="PlayerInteraction\MouseIndicator.cs" />
     <Compile Include="PlayerInteraction\Camera.cs" />
     <Compile Include="PlayerInteraction\Selection.cs" />

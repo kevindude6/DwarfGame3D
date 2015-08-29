@@ -24,12 +24,11 @@ namespace BradGame3D
         public static World2 w;
 
         float camSpeedMod = 20;
-        float DEBUGnuments = 0;
+        public float DEBUGnuments = 0;
 
         Thread chunkLoadingThread;
         Thread pathingThread;
 
-        const float rotationSpeed = 0.005f;
 
         public Matrix View;
         public Matrix Projection;
@@ -39,14 +38,7 @@ namespace BradGame3D
         private GraphicsDeviceManager graphics;
 
         private KeyboardState oldKeyState;
-        private MouseState currentMouseState;
-        private MouseState originalMouseState;
-        private int mouseWheelPrevious;
-        private bool mouseReady;
-        private bool mouseEnabled;
-
-        private Vector3 blockCastTarget = new Vector3(0,0,0);
-        private Vector3 lookFace = new Vector3(0,0,0);
+       
 
         public BoundingFrustum frustum;
         public Texture2D tex;
@@ -59,9 +51,9 @@ namespace BradGame3D
         public AI.Pathing.Node end = null;
         public MouseIndicator mMouseIndicator;
 
-        private Vector3 mouseSelectStart;
-        private Vector3 mouseSelectEnd;
-        private bool currentlySelecting;
+        
+        public MouseController mouseControl;
+        
 
         public PlayerInteraction.GuiLibrary.Gui gui;
         public static GameScreen thisScreen;
@@ -69,15 +61,14 @@ namespace BradGame3D
         public ParticleManager particleMan;
         public List<Citizen> citizenList = new List<Citizen>();
        // private List<MouseIndicator> selectionList = new List<MouseIndicator>();
-        Random r;
+        public Random r;
         public bool loadedChunkThisFrame = false;
 
         private List<double> updateTimes = new List<double>();
 
         static public Blocks.BlockDataManager blockDataManager = new Blocks.BlockDataManager();
-        Art.SpriteSheetManager sheetManager;
+        public Art.SpriteSheetManager sheetManager;
 
-        int currentBlock;
         public static GameScreen getScreen()
         {
             return thisScreen;
@@ -85,27 +76,37 @@ namespace BradGame3D
         public void initBlockData()
         {
             int[] tempSideArray = { 0, 0, 0, 0, 0, 0 };
-            blockDataManager.addBlock("Air", false, false, false, tempSideArray, 32, 320);
+            blockDataManager.addBlock("Air", false, false, false, tempSideArray, 32, 320); //0
 
             tempSideArray = new int[] { 0, 0, 0, 0, 1, 4 };
             //tempSideArray = new int[] { 2, 2, 2, 2, 2, 2 };
-            blockDataManager.addBlock("Grass", true, true, false, tempSideArray, 32, 320);
+            blockDataManager.addBlock("Grass", true, true, false, tempSideArray, 32, 320); //1
 
             tempSideArray = new int[] { 2, 2, 2, 2, 2, 2 };
-            blockDataManager.addBlock("Stone", true, true, false, tempSideArray, 32, 320);
+            blockDataManager.addBlock("Stone", true, true, false, tempSideArray, 32, 320); //2
 
             tempSideArray = new int[] { 4, 4, 4, 4, 4, 4 };
-            blockDataManager.addBlock("Dirt", true, true, false, tempSideArray, 32, 320);
+            blockDataManager.addBlock("Dirt", true, true, false, tempSideArray, 32, 320); //3
 
             tempSideArray = new int[] { 3, 3, 3, 3, 3, 3 };
-            blockDataManager.addBlock("Cobblestone", true, true, false, tempSideArray, 32, 320);
+            blockDataManager.addBlock("Cobblestone", true, true, false, tempSideArray, 32, 320); //4
 
 
             tempSideArray = new int[] { 5, 5, 5, 5, 5, 5 };
-            blockDataManager.addBlock("Light", true, true, true, tempSideArray, 32, 320);
+            blockDataManager.addBlock("Light", true, true, true, tempSideArray, 32, 320); //5
 
             tempSideArray = new int[] {0,0,0,0,0,0};
-            blockDataManager.addBlock("Flora Placeholder", false, true, false, tempSideArray, 32, 320);
+            blockDataManager.addBlock("Flora Placeholder", false, true, false, tempSideArray, 32, 320); //6
+
+            tempSideArray = new int[] {6,6,6,6,6,6};
+            blockDataManager.addBlock("Plank", true, true, false, tempSideArray, 32, 320); //7
+
+            tempSideArray = new int[] { 7, 7, 7, 7, 7, 7 };
+            blockDataManager.addBlock("Sand", true, true, false, tempSideArray, 32, 320); //8
+
+            tempSideArray = new int[] { 8, 8, 8, 8, 8, 8 };
+            blockDataManager.addBlock("Sandstone", true, true, false, tempSideArray, 32, 320); //9
+
         }
 
         public GameScreen(Game1 g)
@@ -121,10 +122,7 @@ namespace BradGame3D
 
             r = new Random();
 
-            Mouse.SetPosition(game.Window.ClientBounds.Width / 2, game.Window.ClientBounds.Height / 2);
-            originalMouseState = Mouse.GetState();
-            currentMouseState = Mouse.GetState();
-            mouseWheelPrevious = originalMouseState.ScrollWheelValue;
+            
             oldKeyState = Keyboard.GetState();
             mMouseIndicator = new MouseIndicator(game);
 
@@ -169,6 +167,7 @@ namespace BradGame3D
             loadThings();
             
             mCam = new Camera(this,w,graphics, new Vector3(256,120,256));
+            mouseControl = new MouseController(this);
 
         }
         public void loadThings()
@@ -211,13 +210,13 @@ namespace BradGame3D
         }
         private void checkFunctionalKeys(KeyboardState k)
         {
-            if (k.IsKeyDown(Keys.M) && oldKeyState.IsKeyUp(Keys.M) && mouseEnabled)
+            if (k.IsKeyDown(Keys.M) && oldKeyState.IsKeyUp(Keys.M) && mouseControl.mouseEnabled)
             {
-                mouseEnabled = false;
+                mouseControl.mouseEnabled = false;
             }
-            else if (k.IsKeyDown(Keys.M) && oldKeyState.IsKeyUp(Keys.M) && !mouseEnabled)
+            else if (k.IsKeyDown(Keys.M) && oldKeyState.IsKeyUp(Keys.M) && !mouseControl.mouseEnabled)
             {
-                mouseEnabled = true;
+                mouseControl.mouseEnabled = true;
             }
             if (k.IsKeyDown(Keys.Escape))
             {
@@ -250,14 +249,6 @@ namespace BradGame3D
             if (pauseplaceholder)
                 pauseplaceholder = false;
 
-            if (k.IsKeyDown(Keys.D0)) currentBlock = 0;
-            if (k.IsKeyDown(Keys.D1)) currentBlock = 1;
-            if (k.IsKeyDown(Keys.D2)) currentBlock = 2;
-            if (k.IsKeyDown(Keys.D3)) currentBlock = 3;
-            if (k.IsKeyDown(Keys.D4)) currentBlock = 4;
-            if (k.IsKeyDown(Keys.D5)) currentBlock = 5;
-            if (k.IsKeyDown(Keys.D6)) currentBlock = 6;
-
             if (k.IsKeyDown(Keys.PageUp) && oldKeyState.IsKeyUp(Keys.PageUp))
             {
                 //w.updateSlice(sliceLevel + 1);
@@ -271,91 +262,11 @@ namespace BradGame3D
                 Thread thread = new Thread(() => w.updateSlice(sliceLevel-1));
                 thread.Start();
             }
-            if (k.IsKeyDown(Keys.C))
-            {
-                Vector3 a = blockCastTarget;
-                if (currentBlock == 0)
-                {
-                    w.setBlockData((byte)currentBlock, (int)Chunk.DATA.ID, a);
-                }
-                else
-                {
-                    w.setBlockData((byte)currentBlock, (int)Chunk.DATA.ID, a+lookFace);
-                }
-            }
 
-            originalMouseState = currentMouseState;
-            currentMouseState = Mouse.GetState();
+            mouseControl.doMouseInput(gameTime);
             //Console.WriteLine("Mouse: (" + currentMouseState.X + "," + currentMouseState.Y + ")");
 
-            if (currentMouseState != originalMouseState)
-            {
-                if(mCam.raycastBlock(ref blockCastTarget,ref lookFace))
-                    mMouseIndicator.setPosition(blockCastTarget);
-                if (currentMouseState.RightButton == ButtonState.Pressed)
-                {
-                    float xDifference = currentMouseState.X - originalMouseState.X;
-                    float yDifference = currentMouseState.Y - originalMouseState.Y;
-                    mCam.yaw-= rotationSpeed * xDifference;
-                    mCam.pitch -= rotationSpeed * yDifference;
-                    //Mouse.SetPosition(game.Window.ClientBounds.Width / 2, game.Window.ClientBounds.Height / 2);
-
-                }
-
-                if (gui.checkClick(currentMouseState.X, currentMouseState.Y))
-                {
-
-                }
-                else
-                {
-                    if (currentMouseState.LeftButton == ButtonState.Pressed && mouseReady)
-                    {
-                        Vector3 a = blockCastTarget;
-                        if (!Vector3.Equals(a, new Vector3(-1, -1, -1)))
-                        {
-
-
-                            SpriteSheetEnhanced tsheet;
-                            sheetManager.dict.TryGetValue(Entities.Creatures.Citizen.SheetName, out tsheet);
-                            test = new Entities.Creatures.Citizen(a + lookFace + new Vector3((float)(r.NextDouble() - 0.5f), 2, (float)(r.NextDouble() - 0.5f)), 100);
-
-                            test.velocity.X = (float) (r.NextDouble() * 10 - 5);
-                            test.velocity.Y = (float)(r.NextDouble() * 10 + 2);
-                            test.velocity.Z = (float)(r.NextDouble() * 10 - 5);
-
-
-                            tsheet.addEnt(test);
-                            citizenList.Add((Citizen)test);
-
-                            DEBUGnuments++;
-                            mouseReady = false;
-
-
-                        }
-                    }
-                }
-                
-                if (currentMouseState.LeftButton == ButtonState.Released)
-                {
-                    mouseReady = true;
-                    if (currentlySelecting)
-                    {
-                        selectionManager.addSelection(mouseSelectStart, mouseSelectEnd, SelectionManager.JOBTYPE.MINING);
-                        currentlySelecting = false;
-                    }
-                }
-
-                if (mouseWheelPrevious < currentMouseState.ScrollWheelValue)
-                {
-                    mCam.camPos += (mCam.cameraRotatedTarget) * (float)gameTime.ElapsedGameTime.TotalSeconds * 300f;
-                    mouseWheelPrevious = currentMouseState.ScrollWheelValue;
-                }
-                else if (mouseWheelPrevious > currentMouseState.ScrollWheelValue)
-                {
-                    mCam.camPos += (mCam.cameraRotatedTarget) * (float)gameTime.ElapsedGameTime.TotalSeconds * -300f;
-                    mouseWheelPrevious = currentMouseState.ScrollWheelValue;
-                }
-            }
+          
 
             Vector3 flatCamTarget = new Vector3(mCam.cameraRotatedTarget.X, 0, mCam.cameraRotatedTarget.Z);
             flatCamTarget.Normalize();

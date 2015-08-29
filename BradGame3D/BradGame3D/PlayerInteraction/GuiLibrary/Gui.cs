@@ -14,6 +14,9 @@ namespace BradGame3D.PlayerInteraction.GuiLibrary
         public Texture2D guiTexture;
         public List<Component> components;
         public GuiTextureAtlas texAtlas;
+        public MenuBar mainMenuBar;
+        public MenuBar buildMenuBar;
+        
         public Gui(GameScreen g)
         {
             gameScreen = g;
@@ -21,15 +24,24 @@ namespace BradGame3D.PlayerInteraction.GuiLibrary
             texAtlas = new GuiTextureAtlas(this);
             loadGuiTex();
             components = new List<Component>();
+
+            MenuBar mainMenuBar = new MenuBar(this, null);
+            components.Add(mainMenuBar);
             
-            Component test = new Component(this,"MainBar.png");
-            ComponentBounds b = new ComponentBounds();
-            b.xAsPercent = 0;
-            b.yAsPercent = 0.9f;
-            b.heightAsPercent = 0.10f;
-            b.widthAsPercent = 1f;
-            test.setBounds(b);
-            components.Add(test);
+
+            MenuBar buildMenuBar = new MenuBar(this, null);
+            components.Add(buildMenuBar);
+
+            mainMenuBar.addButton("DigIcon", "DigIcon.png",delegate() {gameScreen.game.Exit();});
+            mainMenuBar.addButton("BuildIcon", "BuildIcon.png", delegate() { buildMenuBar.visible = true; mainMenuBar.visible = false; gameScreen.mouseControl.mode = MouseController.MODE.BUILD;});
+
+            buildMenuBar.visible = false;
+            buildMenuBar.addButton("DirtButton", "DirtIcon.png", delegate() { gameScreen.mouseControl.currentBuild = 3; });
+            buildMenuBar.addButton("StoneButton", "StoneIcon.png", delegate() {gameScreen.mouseControl.currentBuild = 2;});
+            buildMenuBar.addButton("CobbleButton", "StoneIcon.png", delegate() { gameScreen.mouseControl.currentBuild = 4; });
+            buildMenuBar.addButton("PlankButton", "StoneIcon.png", delegate() { gameScreen.mouseControl.currentBuild = 7; });
+            buildMenuBar.addButton("SandstoneButton", "StoneIcon.png", delegate() { gameScreen.mouseControl.currentBuild = 9; });
+           
         }
         public bool checkClick(int x, int y)
         {

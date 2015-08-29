@@ -8,12 +8,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BradGame3D.Art
 {
-    class SpriteSheetManager
+    public class SpriteSheetManager
     {
         public Dictionary<string, SpriteSheetEnhanced> dict = new Dictionary<string, SpriteSheetEnhanced>();
         //List<SpriteSheet> sheets;
         public GameScreen gameScreen;
-        XmlSerializer xserial;
         public SpriteSheetManager(GameScreen g)
         {
             gameScreen = g;
